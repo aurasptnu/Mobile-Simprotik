@@ -27,21 +27,25 @@ const arrowIcon = require('../../assets/images/panah.png');
 export default function SurveyScreen() {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
-  const { taskId, onSurveyComplete } = route.params || {};
+  const { taskId, taskType, onSurveyComplete } = route.params || {};
 
   // answers keyed by question id
   const [answers, setAnswers] = useState<{[k:string]: string}>({});
   const [comment, setComment] = useState('');
   const [nama, setNama] = useState('');
   const [nip, setNip] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   const submitSurvey = async () => {
+    setSubmitting(true);
     // validate personal info
     if (!nama.trim()) {
+      setSubmitting(false);
       Alert.alert('Perhatian', 'Harap isi nama Anda.');
       return;
     }
     if (!nip.trim()) {
+      setSubmitting(false);
       Alert.alert('Perhatian', 'Harap isi NIP Anda.');
       return;
     }
@@ -103,7 +107,7 @@ export default function SurveyScreen() {
     setComment('');
     setNama('');
     setNip('');
-
+    setSubmitting(false);
     Alert.alert('Berhasil', 'Survey berhasil disubmit', [
       {
         text: 'OK',
@@ -188,8 +192,12 @@ export default function SurveyScreen() {
         </View>
       ))}
 
-      <TouchableOpacity style={styles.button} onPress={submitSurvey}>
-        <Text style={styles.buttonText}>Submit Survey</Text>
+      <TouchableOpacity style={styles.button} onPress={submitSurvey} disabled={submitting}>
+        {submitting ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.buttonText}>Submit Survey</Text>
+        )}
       </TouchableOpacity>
     </ScrollView>
   );

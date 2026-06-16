@@ -1,7 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-} from 'react';
+import React, { useState, useEffect } from 'react';
 
 import {
   View,
@@ -10,6 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Modal,
+  ActivityIndicator,
 } from 'react-native';
 
 import {
@@ -32,224 +30,142 @@ const profileIcon = require('../../assets/images/profile.png');
 const arrowIcon = require('../../assets/images/panah.png');
 
 export default function TaskDetailScreen() {
-  const route =
-    useRoute<any>();
+  const route = useRoute<any>();
+  const navigation = useNavigation<any>();
+  const { task } = route.params;
 
-  const navigation =
-    useNavigation<any>();
+  const [detail, setDetail] = useState<any>(null);
+  const [dokumenExists, setDokumenExists] = useState(false);
+  const [dokumenUrl, setDokumenUrl] = useState<string | null>(null);
+  const [dokumenId, setDokumenId] = useState<any>(null);
 
-  const { task } =
-    route.params;
+  const [photo, setPhoto] = useState<string | null>(null);
+  const [surveyCompleted, setSurveyCompleted] = useState(task?.surveyCompleted ?? false);
+  const [showPhotoModal, setShowPhotoModal] = useState(false);
+  const [showSurveyModal, setShowSurveyModal] = useState(false);
 
-  const [
-    photo,
-    setPhoto,
-  ] = useState<
-    string | null
-  >(null);
-
-  const [
-    const [detail, setDetail] = useState<any>(null);
-    const [dokumenExists, setDokumenExists] = useState(false);
-    const [dokumenUrl, setDokumenUrl] = useState<string | null>(null);
-    const [dokumenId, setDokumenId] = useState<any>(null);
-    surveyCompleted,
-    setSurveyCompleted,
-      loadDetail();
-    task?.surveyCompleted ?? false,
-  );
-
-  const [
-        loadDetail();
-    setShowPhotoModal,
-  ] = useState(false);
-
-  const [
-    showSurveyModal,
-    setShowSurveyModal,
-  ] = useState(false);
+  const [loadingDetail, setLoadingDetail] = useState<boolean>(true);
+  const [uploading, setUploading] = useState<boolean>(false);
 
   useEffect(() => {
-    loadStorageData();
+    loadDetail();
   }, []);
 
   useFocusEffect(
     React.useCallback(() => {
-      loadStorageData();
+      loadDetail();
     }, [task.id]),
   );
 
-  const loadStorageData =
-    async () => {
-      try {
-        const savedDoc =
-          await AsyncStorage.getItem(
-            `task_doc_${task.id}`,
-          );
-        if (savedDoc) {
-          setPhoto(savedDoc);
+  const loadDetail = async () => {
+    setLoadingDetail(true);
+    try {
+      const user = await getUser();
+      const id_pengguna = user?.id || user?.nip || user?.email;
+
+      const endpoint = (task.type || '').toLowerCase().includes('proyek')
+        ? `/mobile/proyek/${task.id}`
+        : `/mobile/pekerjaan/${task.id}`;
+
+      const res = await api.get(endpoint, { params: { id_pengguna } });
+
+      if (res && res.data) {
+        setDetail(res.data);
+
+        if (res.data.sudah_ada_dokumentasi) setDokumenExists(true);
+        if (res.data.id_dokumen) setDokumenId(res.data.id_dokumen);
+        if (res.data.dokumen && (res.data.dokumen.file || res.data.dokumen.url)) {
+          setDokumenUrl(res.data.dokumen.file || res.data.dokumen.url);
         }
-  
-    const loadDetail = async () => {
-      try {
-        const user = await getUser();
-        const id_pengguna = user?.id || user?.nip || user?.email;
-
-        const endpoint = (task.type || '').toLowerCase().includes('proyek')
-          ? `/mobile/proyek/${task.id}`
-          : `/mobile/pekerjaan/${task.id}`;
-
-        const res = await api.get(endpoint, { params: { id_pengguna } });
-
-        if (res && res.data) {
-          setDetail(res.data);
-
-          // response fields per API spec
-          if (res.data.sudah_ada_dokumentasi) {
-            setDokumenExists(true);
-          }
-
-          if (res.data.id_dokumen) setDokumenId(res.data.id_dokumen);
-          if (res.data.dokumen && res.data.dokumen.file) {
-            setDokumenUrl(res.data.dokumen.file);
-          } else if (res.data.dokumen && res.data.dokumen.url) {
-            setDokumenUrl(res.data.dokumen.url);
-          }
-
-          if (res.data.sudah_ada_survei) setSurveyCompleted(true);
-        }
-      } catch (error) {
-        console.log('loadDetail error, falling back to local storage', error);
-
-        // fallback to previous local behavior
-        try {
-          const savedDoc = await AsyncStorage.getItem(`task_doc_${task.id}`);
-          if (savedDoc) setPhoto(savedDoc);
-
-          const savedSurvey = await AsyncStorage.getItem(`task_survey_${task.id}`);
-          if (savedSurvey === 'true') setSurveyCompleted(true);
-        } catch (e) {
-          console.log('fallback load error', e);
-        }
-      }
-    };
-
-        const savedSurvey =
-          await AsyncStorage.getItem(
-            `task_survey_${task.id}`,
-          );
-        if (savedSurvey === 'true') {
-          setSurveyCompleted(true);
-        }
-      } catch (error) {
-        console.log(
-          'Error loading storage:',
-          error,
-        );
-      }
-    };
-
-  const handleUpload =
-    async () => {
-      const result =
-            // try upload to backend
-            try {
-              const user = await getUser();
-              const id_pengguna = user?.id || user?.nip || user?.email;
-
-              const endpoint = (task.type || '').toLowerCase().includes('proyek')
-                ? `/mobile/proyek/${task.id}/dokumentasi-akhir`
-                : `/mobile/pekerjaan/${task.id}/dokumentasi-akhir`;
-
-              const form = new FormData();
-              form.append('id_pengguna', id_pengguna);
-
-              const filename = uri.split('/').pop() || `photo_${Date.now()}.jpg`;
-              const fileType = (result.assets[0].type) || 'image/jpeg';
-
-              // @ts-ignore
-              form.append('dokumentasi_akhir', {
-                uri,
-                name: filename,
-                type: fileType,
-              });
-
-              const uploadRes = await api.post(endpoint, form, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-              });
-
-              if (uploadRes && uploadRes.data) {
-                setDokumenExists(true);
-                setDokumenId(uploadRes.data.id_dokumen || uploadRes.data.id || null);
-                // try to read file url
-                if (uploadRes.data.dokumen && (uploadRes.data.dokumen.file || uploadRes.data.dokumen.url)) {
-                  setDokumenUrl(uploadRes.data.dokumen.file || uploadRes.data.dokumen.url);
-                }
-
-                // keep local preview
-                setPhoto(uri);
-                await AsyncStorage.setItem(`task_doc_${task.id}`, uri);
-              }
-            } catch (uploadErr) {
-              console.log('upload failed, saving locally', uploadErr);
-              setPhoto(uri);
-              await AsyncStorage.setItem(`task_doc_${task.id}`, uri);
-            }
-          },
-        );
-
-      if (
-        result.assets
-      ) {
-        const uri =
-          result.assets[0]
-            .uri || null;
-        if (uri) {
-          setPhoto(uri);
-          await AsyncStorage.setItem(
-            `task_doc_${task.id}`,
-            uri,
-          );
-        }
-      }
-    };
-
-  const handleDocumentPress =
-    () => {
-      if (photo) {
-        setShowPhotoModal(true);
+        if (res.data.sudah_ada_survei) setSurveyCompleted(true);
       } else {
-        handleUpload();
+        // fallback to local storage
+        const savedDoc = await AsyncStorage.getItem(`task_doc_${task.id}`);
+        if (savedDoc) setPhoto(savedDoc);
+        const savedSurvey = await AsyncStorage.getItem(`task_survey_${task.id}`);
+        if (savedSurvey === 'true') setSurveyCompleted(true);
       }
-    };
-
-  const saveSurveyStatus =
-    async (status: boolean) => {
+    } catch (error) {
+      console.log('loadDetail error, falling back to local storage', error);
       try {
-        await AsyncStorage.setItem(
-          `task_survey_${task.id}`,
-          String(status),
-        );
-        setSurveyCompleted(status);
-      } catch (error) {
-        console.log(
-          'Error saving survey:',
-          error,
-        );
+        const savedDoc = await AsyncStorage.getItem(`task_doc_${task.id}`);
+        if (savedDoc) setPhoto(savedDoc);
+        const savedSurvey = await AsyncStorage.getItem(`task_survey_${task.id}`);
+        if (savedSurvey === 'true') setSurveyCompleted(true);
+      } catch (e) {
+        console.log('fallback load error', e);
       }
-    };
+    } finally {
+      setLoadingDetail(false);
+    }
+  };
+
+  const handleUpload = async () => {
+    const result = await launchImageLibrary({ mediaType: 'photo', quality: 0.8 });
+
+    if (!result.assets) return;
+
+    const uri = result.assets[0].uri || null;
+    if (!uri) return;
+
+    setUploading(true);
+    try {
+      const user = await getUser();
+      const id_pengguna = user?.id || user?.nip || user?.email;
+
+      const endpoint = (task.type || '').toLowerCase().includes('proyek')
+        ? `/mobile/proyek/${task.id}/dokumentasi-akhir`
+        : `/mobile/pekerjaan/${task.id}/dokumentasi-akhir`;
+
+      const form: any = new FormData();
+      form.append('id_pengguna', id_pengguna);
+
+      const filename = uri.split('/').pop() || `photo_${Date.now()}.jpg`;
+      const fileType = result.assets[0].type || 'image/jpeg';
+
+      // @ts-ignore
+      form.append('dokumentasi_akhir', { uri, name: filename, type: fileType });
+
+      const uploadRes = await api.post(endpoint, form, { headers: { 'Content-Type': 'multipart/form-data' } });
+
+      if (uploadRes && uploadRes.data) {
+        setDokumenExists(true);
+        setDokumenId(uploadRes.data.id_dokumen || uploadRes.data.id || null);
+        if (uploadRes.data.dokumen && (uploadRes.data.dokumen.file || uploadRes.data.dokumen.url)) {
+          setDokumenUrl(uploadRes.data.dokumen.file || uploadRes.data.dokumen.url);
+        }
+        setPhoto(uri);
+        await AsyncStorage.setItem(`task_doc_${task.id}`, uri);
+      }
+    } catch (uploadErr) {
+      console.log('upload failed, saving locally', uploadErr);
+      setPhoto(uri);
+      await AsyncStorage.setItem(`task_doc_${task.id}`, uri);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDocumentPress = () => {
+    if (photo || dokumenExists) {
+      setShowPhotoModal(true);
+    } else {
+      handleUpload();
+    }
+  };
+
+  const saveSurveyStatus = async (status: boolean) => {
+    try {
+      await AsyncStorage.setItem(`task_survey_${task.id}`, String(status));
+      setSurveyCompleted(status);
+    } catch (error) {
+      console.log('Error saving survey:', error);
+    }
+  };
 
   const handleSurvey = () => {
     if (!surveyCompleted) {
-      navigation.navigate(
-        'Survey',
-        {
-          taskId: task.id,
-          taskType: task.type,
-          onSurveyComplete: () =>
-            saveSurveyStatus(true),
-        },
-      );
+      navigation.navigate('Survey', { taskId: task.id, taskType: task.type, onSurveyComplete: () => saveSurveyStatus(true) });
     } else {
       setShowSurveyModal(true);
     }
@@ -261,16 +177,16 @@ export default function TaskDetailScreen() {
     )
       ? task.assignedTo
       : [task.assignedTo];
+  if (loadingDetail) {
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <ActivityIndicator size="large" color="#2563EB" />
+      </View>
+    );
+  }
 
   return (
-    <ScrollView
-      style={
-        styles.container
-      }
-      showsVerticalScrollIndicator={
-        false
-      }
-    >
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <TouchableOpacity
         style={styles.backButton}
         onPress={() => navigation.goBack()}
@@ -459,22 +375,15 @@ export default function TaskDetailScreen() {
             : 'Belum upload dokumentasi'}
         </Text>
         <TouchableOpacity
-          style={
-            styles.actionButton
-          }
-          onPress={
-            handleDocumentPress
-          }
+          style={styles.actionButton}
+          onPress={handleDocumentPress}
+          disabled={uploading}
         >
-          <Text
-            style={
-              styles.actionButtonText
-            }
-          >
-            {photo
-              ? 'Lihat Dokumen'
-              : 'Upload Dokumentasi'}
-          </Text>
+          {uploading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.actionButtonText}>{photo ? 'Lihat Dokumen' : 'Upload Dokumentasi'}</Text>
+          )}
         </TouchableOpacity>
       </View>
 
