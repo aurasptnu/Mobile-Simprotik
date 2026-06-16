@@ -25,6 +25,8 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { styles } from './styles';
+import { api } from '../../services/api';
+import { getUser } from '../../storage/auth';
 
 const profileIcon = require('../../assets/images/profile.png');
 const arrowIcon = require('../../assets/images/panah.png');
@@ -47,14 +49,18 @@ export default function TaskDetailScreen() {
   >(null);
 
   const [
+    const [detail, setDetail] = useState<any>(null);
+    const [dokumenExists, setDokumenExists] = useState(false);
+    const [dokumenUrl, setDokumenUrl] = useState<string | null>(null);
+    const [dokumenId, setDokumenId] = useState<any>(null);
     surveyCompleted,
     setSurveyCompleted,
-  ] = useState(
+      loadDetail();
     task?.surveyCompleted ?? false,
   );
 
   const [
-    showPhotoModal,
+        loadDetail();
     setShowPhotoModal,
   ] = useState(false);
 
@@ -83,6 +89,50 @@ export default function TaskDetailScreen() {
         if (savedDoc) {
           setPhoto(savedDoc);
         }
+  
+    const loadDetail = async () => {
+      try {
+        const user = await getUser();
+        const id_pengguna = user?.id || user?.nip || user?.email;
+
+        const endpoint = (task.type || '').toLowerCase().includes('proyek')
+          ? `/mobile/proyek/${task.id}`
+          : `/mobile/pekerjaan/${task.id}`;
+
+        const res = await api.get(endpoint, { params: { id_pengguna } });
+
+        if (res && res.data) {
+          setDetail(res.data);
+
+          // response fields per API spec
+          if (res.data.sudah_ada_dokumentasi) {
+            setDokumenExists(true);
+          }
+
+          if (res.data.id_dokumen) setDokumenId(res.data.id_dokumen);
+          if (res.data.dokumen && res.data.dokumen.file) {
+            setDokumenUrl(res.data.dokumen.file);
+          } else if (res.data.dokumen && res.data.dokumen.url) {
+            setDokumenUrl(res.data.dokumen.url);
+          }
+
+          if (res.data.sudah_ada_survei) setSurveyCompleted(true);
+        }
+      } catch (error) {
+        console.log('loadDetail error, falling back to local storage', error);
+
+        // fallback to previous local behavior
+        try {
+          const savedDoc = await AsyncStorage.getItem(`task_doc_${task.id}`);
+          if (savedDoc) setPhoto(savedDoc);
+
+          const savedSurvey = await AsyncStorage.getItem(`task_survey_${task.id}`);
+          if (savedSurvey === 'true') setSurveyCompleted(true);
+        } catch (e) {
+          console.log('fallback load error', e);
+        }
+      }
+    };
 
         const savedSurvey =
           await AsyncStorage.getItem(
@@ -102,11 +152,49 @@ export default function TaskDetailScreen() {
   const handleUpload =
     async () => {
       const result =
-        await launchImageLibrary(
-          {
-            mediaType:
-              'photo',
-            quality: 0.8,
+            // try upload to backend
+            try {
+              const user = await getUser();
+              const id_pengguna = user?.id || user?.nip || user?.email;
+
+              const endpoint = (task.type || '').toLowerCase().includes('proyek')
+                ? `/mobile/proyek/${task.id}/dokumentasi-akhir`
+                : `/mobile/pekerjaan/${task.id}/dokumentasi-akhir`;
+
+              const form = new FormData();
+              form.append('id_pengguna', id_pengguna);
+
+              const filename = uri.split('/').pop() || `photo_${Date.now()}.jpg`;
+              const fileType = (result.assets[0].type) || 'image/jpeg';
+
+              // @ts-ignore
+              form.append('dokumentasi_akhir', {
+                uri,
+                name: filename,
+                type: fileType,
+              });
+
+              const uploadRes = await api.post(endpoint, form, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+              });
+
+              if (uploadRes && uploadRes.data) {
+                setDokumenExists(true);
+                setDokumenId(uploadRes.data.id_dokumen || uploadRes.data.id || null);
+                // try to read file url
+                if (uploadRes.data.dokumen && (uploadRes.data.dokumen.file || uploadRes.data.dokumen.url)) {
+                  setDokumenUrl(uploadRes.data.dokumen.file || uploadRes.data.dokumen.url);
+                }
+
+                // keep local preview
+                setPhoto(uri);
+                await AsyncStorage.setItem(`task_doc_${task.id}`, uri);
+              }
+            } catch (uploadErr) {
+              console.log('upload failed, saving locally', uploadErr);
+              setPhoto(uri);
+              await AsyncStorage.setItem(`task_doc_${task.id}`, uri);
+            }
           },
         );
 
@@ -157,6 +245,7 @@ export default function TaskDetailScreen() {
         'Survey',
         {
           taskId: task.id,
+          taskType: task.type,
           onSurveyComplete: () =>
             saveSurveyStatus(true),
         },

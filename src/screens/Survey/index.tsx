@@ -15,6 +15,8 @@ import {
   useRoute,
 } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { api } from '../../services/api';
+import { getUser } from '../../storage/auth';
 
 import { addSurveyResponse } from '../../data/survey';
 import { surveyQuestions } from '../../data/surveyQuestions';
@@ -60,14 +62,37 @@ export default function SurveyScreen() {
       comment,
       submittedAt: new Date().toISOString(),
     } as any;
-
+    // save locally as before
     await addSurveyResponse(newSurvey);
 
+    // if invoked from TaskDetail with taskId, try submit to backend
     if (taskId) {
-      await AsyncStorage.setItem(
-        `task_survey_${taskId}`,
-        'true',
-      );
+      try {
+        const user = await getUser();
+        const id_pengguna = user?.id || user?.nip || user?.email;
+
+        const payload: any = {
+          id_pengguna,
+          nama_klien: nama,
+          nip_klien: nip,
+          jawaban1: answers['q1'] || '',
+          jawaban2: answers['q2'] || '',
+          jawaban3: answers['q3'] || '',
+          jawaban4: answers['q4'] || '',
+          jawaban5: answers['q5'] || '',
+          jawaban6: comment || '',
+        };
+
+        const endpoint = (taskType || '').toLowerCase().includes('proyek')
+          ? `/mobile/proyek/${taskId}/survei`
+          : `/mobile/pekerjaan/${taskId}/survei`;
+
+        await api.post(endpoint, payload);
+
+        await AsyncStorage.setItem(`task_survey_${taskId}`, 'true');
+      } catch (err) {
+        console.log('submitSurvey backend error', err);
+      }
     }
 
     if (typeof onSurveyComplete === 'function') {
