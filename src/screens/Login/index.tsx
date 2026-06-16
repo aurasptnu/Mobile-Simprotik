@@ -15,11 +15,10 @@ import {
   useNavigation,
 } from '@react-navigation/native';
 
-import { users } from '../../data/users';
+import { loginUser } from '../../services/auth';
 
 import {
   saveUser,
-  getUser,
 } from '../../storage/auth';
 
 import { styles } from './styles';
@@ -39,6 +38,9 @@ export default function LoginScreen() {
   const [error, setError] =
     useState('');
 
+  const [loading, setLoading] =
+    useState(false);
+
   const handleLogin =
     async () => {
       if (
@@ -48,55 +50,38 @@ export default function LoginScreen() {
         setError(
           'Email dan password wajib diisi',
         );
-
         return;
       }
 
-      const user =
-        users.find(
-          u =>
-            u.email
-              .trim()
-              .toLowerCase() ===
-              email
-                .trim()
-                .toLowerCase() &&
-            u.password ===
-              password,
+      setLoading(true);
+      setError('');
+
+      try {
+        const user = await loginUser(
+          email,
+          password,
         );
 
-      if (user) {
-        try {
-          console.log(
-            'LOGIN SUCCESS:',
-            user,
+        if (!user) {
+          setError(
+            'Email atau password salah',
           );
-
-          await saveUser(
-            user,
-          );
-
-          const savedUser =
-            await getUser();
-
-          console.log(
-            'USER TERSIMPAN:',
-            savedUser,
-          );
-
-          navigation.replace(
-            'Main',
-          );
-        } catch (err) {
-          console.log(
-            'LOGIN ERROR:',
-            err,
-          );
+          return;
         }
-      } else {
-        setError(
-          'Email atau password salah',
-        );
+
+        await saveUser(user);
+        navigation.replace('Main');
+      } catch (err: any) {
+        console.log('LOGIN ERROR:', err);
+
+        const message =
+          err?.response?.data?.message ||
+          err?.message ||
+          'Terjadi kesalahan saat login';
+
+        setError(message);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -225,13 +210,14 @@ export default function LoginScreen() {
             onPress={
               handleLogin
             }
+            disabled={loading}
           >
             <Text
               style={
                 styles.buttonText
               }
             >
-              Masuk
+              {loading ? 'Memuat...' : 'Masuk'}
             </Text>
           </TouchableOpacity>
         </View>
