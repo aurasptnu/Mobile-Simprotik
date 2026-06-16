@@ -1,45 +1,23 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import React, {useEffect} from 'react';
+import {NativeModules} from 'react-native';
+import AppNavigation from './src/navigation';
+import {loadSurveysFromFile} from './src/data/survey';
 
-import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
-import {
-  SafeAreaProvider,
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
+export default function App() {
+  useEffect(() => {
+    const loadSurveyData = async () => {
+      await loadSurveysFromFile();
 
-function App() {
-  const isDarkMode = useColorScheme() === 'dark';
+      console.log('NATIVE MODULE AsyncStorage:', NativeModules.AsyncStorage);
+      try {
+        console.log('NATIVE MODULE KEYS:', Object.keys(NativeModules));
+      } catch (e) {
+        console.log('NATIVE MODULE KEYS ERROR:', e);
+      }
+    };
 
-  return (
-    <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <AppContent />
-    </SafeAreaProvider>
-  );
+    loadSurveyData();
+  }, []);
+
+  return <AppNavigation />;
 }
-
-function AppContent() {
-  const safeAreaInsets = useSafeAreaInsets();
-
-  return (
-    <View style={styles.container}>
-      <NewAppScreen
-        templateFileName="App.tsx"
-        safeAreaInsets={safeAreaInsets}
-      />
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
-
-export default App;

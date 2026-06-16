@@ -1,0 +1,473 @@
+import React, {
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
+
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  FlatList,
+  TextInput,
+  TouchableWithoutFeedback,
+} from 'react-native';
+
+import {
+  Image,
+} from 'react-native';
+
+import {
+  useNavigation,
+} from '@react-navigation/native';
+
+import {
+  getUser,
+} from '../../storage/auth';
+
+import {
+  tasks,
+} from '../../data/tasks';
+
+import { styles } from './styles';
+
+const arrowIcon = require('../../assets/images/panah.png');
+const profileIcon = require('../../assets/images/profile.png');
+
+export default function TasksScreen() {
+  const navigation =
+    useNavigation<any>();
+
+  const [
+    selectedTab,
+    setSelectedTab,
+  ] = useState(
+    'Semua',
+  );
+
+  const [
+    searchQuery,
+    setSearchQuery,
+  ] = useState('');
+
+  const [
+    filterMenuVisible,
+    setFilterMenuVisible,
+  ] = useState(false);
+
+  const [
+    baseTasks,
+    setBaseTasks,
+  ] = useState<any[]>(
+    [],
+  );
+
+  const [
+    filteredTasks,
+    setFilteredTasks,
+  ] = useState<any[]>(
+    [],
+  );
+
+  const [
+    loading,
+    setLoading,
+  ] = useState(false);
+
+  const loadTasks = useCallback(
+    async () => {
+      setLoading(true);
+
+      try {
+        const user =
+          await getUser();
+
+        console.log(
+          'USER LOGIN:',
+          user,
+        );
+
+        if (!user) {
+          setFilteredTasks(
+            [],
+          );
+
+          return;
+        }
+
+        let myTasks =
+          tasks.filter(
+            task => {
+              const assigned = task.assignedTo;
+              const userEmail = String(user.email || '')
+                .trim()
+                .toLowerCase();
+
+              const isAssigned = Array.isArray(assigned)
+                ? assigned.map(a => String(a).trim().toLowerCase()).includes(userEmail)
+                : String(assigned).trim().toLowerCase() === userEmail;
+
+              return isAssigned && task.isStarted === true;
+            },
+          );
+
+        console.log(
+          'FILTERED TASK:',
+          myTasks,
+        );
+
+        setBaseTasks(
+          myTasks,
+        );
+        setFilteredTasks(
+          myTasks,
+        );
+      } catch (error) {
+        console.log(
+          'LOAD TASK ERROR:',
+          error,
+        );
+      } finally {
+        setLoading(false);
+      }
+    }, [
+      navigation,
+    ]);
+
+  const applyFilters = useCallback(() => {
+    let myTasks = [...baseTasks];
+
+    if (
+      selectedTab ===
+      'Selesai'
+    ) {
+      myTasks =
+        myTasks.filter(
+          task =>
+            task.status ===
+            'Selesai',
+        );
+    } else if (
+      selectedTab ===
+      'Sedang Berlangsung'
+    ) {
+      myTasks =
+        myTasks.filter(
+          task =>
+            task.status ===
+            'Sedang Berlangsung',
+        );
+    } else if (
+      selectedTab ===
+      'Dalam Tinjauan'
+    ) {
+      myTasks =
+        myTasks.filter(
+          task =>
+            task.status ===
+            'Dalam Tinjauan',
+        );
+    }
+
+    if (
+      searchQuery.trim().length > 0
+    ) {
+      const query =
+        searchQuery
+          .trim()
+          .toLowerCase();
+
+      myTasks =
+        myTasks.filter(
+          task =>
+            task.title
+              .toLowerCase()
+              .includes(query),
+        );
+    }
+
+    setFilteredTasks(
+      myTasks,
+    );
+  }, [
+    baseTasks,
+    selectedTab,
+    searchQuery,
+  ]);
+
+  useEffect(() => {
+    loadTasks();
+
+    const unsubscribe =
+      navigation.addListener(
+        'focus',
+        loadTasks,
+      );
+
+    return unsubscribe;
+  }, [
+    navigation,
+    loadTasks,
+  ]);
+
+  useEffect(() => {
+    applyFilters();
+  }, [applyFilters]);
+
+  const getStatusStyle =
+    (
+      status: string,
+    ) => {
+      switch (
+        status
+      ) {
+        case 'Sedang Berlangsung':
+          return styles.orangeBadge;
+
+        case 'Dalam Tinjauan':
+          return styles.yellowBadge;
+
+        case 'Selesai':
+          return styles.greenBadge;
+
+        default:
+          return styles.grayBadge;
+      }
+    };
+
+  const renderTask =
+    ({ item }: any) => (
+      <TouchableOpacity
+        style={
+          styles.taskCard
+        }
+        onPress={() =>
+          navigation.navigate(
+            'TaskDetail',
+            {
+              task:
+                item,
+            },
+          )
+        }
+      >
+        <View
+          style={
+            styles.rowBetween
+          }
+        >
+          <View
+            style={[
+              styles.badge,
+              getStatusStyle(
+                item.status,
+              ),
+            ]}
+          >
+            <Text
+              style={
+                styles.badgeText
+              }
+            >
+              {
+                item.status
+              }
+            </Text>
+          </View>
+
+          <Image
+            source={arrowIcon}
+            style={{
+              width: 18,
+              height: 18,
+              tintColor: '#9CA3AF',
+              resizeMode: 'contain',
+            }}
+          />
+        </View>
+
+        <Text
+          style={
+            styles.taskTitle
+          }
+        >
+          {item.title}
+        </Text>
+
+        <Text
+          style={
+            styles.taskInfo
+          }
+        >
+          Tipe: {item.type || 'Pekerjaan'}
+        </Text>
+
+        <Text
+          style={
+            styles.taskInfo
+          }
+        >
+          Ditugaskan oleh: {item.assignedBy}
+        </Text>
+
+        <Text
+          style={
+            styles.deadline
+          }
+        >
+          Deadline: {item.deadline}
+        </Text>
+      </TouchableOpacity>
+    );
+
+  const handleSearch = () => {
+    applyFilters();
+  };
+
+  return (
+    <TouchableWithoutFeedback
+      onPress={() =>
+        filterMenuVisible &&
+        setFilterMenuVisible(
+          false,
+        )
+      }
+    >
+      <View
+        style={
+          styles.container
+        }
+      >
+      <Text
+        style={
+          styles.header
+        }
+      >
+        Daftar Tugas
+      </Text>
+
+      <View
+        style={
+          styles.searchFilterRow
+        }
+      >
+        <View
+          style={
+            styles.searchBox
+          }
+        >
+          <TextInput
+            style={
+              styles.searchInput
+            }
+            placeholder="Cari tugas"
+            placeholderTextColor="#9CA3AF"
+            value={searchQuery}
+            onChangeText={text =>
+              setSearchQuery(text)
+            }
+            returnKeyType="search"
+          />
+        </View>
+
+        <TouchableOpacity
+          style={
+            styles.filterToggle
+          }
+          onPress={() =>
+            setFilterMenuVisible(
+              prev => !prev,
+            )
+          }
+        >
+          <Text
+            style={
+              styles.filterToggleText
+            }
+          >
+            Filter
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {filterMenuVisible && (
+        <View
+          style={
+            styles.filterMenu
+          }
+        >
+          {[
+            'Semua',
+            'Sedang Berlangsung',
+            'Dalam Tinjauan',
+            'Selesai',
+          ].map(option => (
+            <TouchableOpacity
+              key={option}
+              style={[
+                styles.filterOption,
+                selectedTab ===
+                  option &&
+                  styles.activeOption,
+              ]}
+              onPress={() => {
+                setSelectedTab(
+                  option,
+                );
+                setFilterMenuVisible(
+                  false,
+                );
+              }}
+            >
+              <Text
+                style={[
+                  styles.filterOptionText,
+                  selectedTab ===
+                    option &&
+                    styles.activeOptionText,
+                ]}
+              >
+                {option}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
+
+      {!loading && filteredTasks.length === 0 && (
+        <View
+          style={{
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginTop: 40,
+          }}
+        >
+          <Text
+            style={{
+              color: '#6B7280',
+              fontSize: 16,
+            }}
+          >
+            Belum ada tugas untuk user ini.
+          </Text>
+        </View>
+      )}
+
+      <FlatList
+        data={
+          filteredTasks
+        }
+        renderItem={
+          renderTask
+        }
+        keyExtractor={item =>
+          item.id.toString()
+        }
+        showsVerticalScrollIndicator={
+          false
+        }
+      />
+    </View>
+  </TouchableWithoutFeedback>
+  );
+}
