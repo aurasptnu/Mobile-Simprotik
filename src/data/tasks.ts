@@ -1,3 +1,5 @@
+import { api } from '../services/api';
+
 export const tasks = [
   {
     id: 1,
@@ -1236,3 +1238,16 @@ export const tasks = [
   },
 
 ];
+
+// Fetch tasks from mobile API (fallback to local `tasks` on error)
+export async function fetchTasks(id_pengguna: string) {
+  try {
+    const res = await api.get('/mobile/pekerjaan-aktif', {
+      params: { id_pengguna },
+    });
+    return res.data;
+  } catch (error) {
+    console.log('fetchTasks error, returning local mock tasks', error);
+    return tasks;
+  }
+}

@@ -27,6 +27,7 @@ import {
 
 import {
   tasks,
+  fetchTasks,
 } from '../../data/tasks';
 
 import { styles } from './styles';
@@ -95,21 +96,35 @@ export default function TasksScreen() {
           return;
         }
 
-        let myTasks =
-          tasks.filter(
-            task => {
-              const assigned = task.assignedTo;
-              const userEmail = String(user.email || '')
-                .trim()
-                .toLowerCase();
+        // Try fetching from backend first; fallback to local mock tasks
+        let myTasks: any[] = [];
 
-              const isAssigned = Array.isArray(assigned)
-                ? assigned.map(a => String(a).trim().toLowerCase()).includes(userEmail)
-                : String(assigned).trim().toLowerCase() === userEmail;
+        try {
+          const identifier = user.id || user.nip || user.email;
+          const remote = await fetchTasks(identifier);
 
-              return isAssigned && task.isStarted === true;
-            },
-          );
+          if (Array.isArray(remote)) {
+            myTasks = remote;
+          } else if (remote && Array.isArray((remote as any).data)) {
+            myTasks = (remote as any).data;
+          }
+        } catch (e) {
+          console.log('remote fetch failed, using local tasks', e);
+        }
+
+        // If remote didn't provide tasks, filter local mock tasks
+        if (!myTasks || myTasks.length === 0) {
+          const userEmail = String(user.email || '').trim().toLowerCase();
+
+          myTasks = tasks.filter(task => {
+            const assigned = task.assignedTo;
+            const isAssigned = Array.isArray(assigned)
+              ? assigned.map((a: any) => String(a).trim().toLowerCase()).includes(userEmail)
+              : String(assigned).trim().toLowerCase() === userEmail;
+
+            return isAssigned && task.isStarted === true;
+          });
+        }
 
         console.log(
           'FILTERED TASK:',

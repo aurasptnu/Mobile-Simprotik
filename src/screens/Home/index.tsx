@@ -22,7 +22,9 @@ import {
 
 import {
   tasks,
+  fetchTasks,
 } from '../../data/tasks';
+import api from '../../services/api';
 
 import { styles } from './styles';
 
@@ -60,26 +62,46 @@ export default function HomeScreen() {
       }
 
       setUser(loggedUser);
+      // Try backend endpoints first (ngrok), fallback to local mock data
+      const identifier = loggedUser.id || loggedUser.nip || loggedUser.email;
 
-      const filteredTasks =
-        tasks.filter(
-          task => {
-            const assigned = task.assignedTo;
-            const userEmail = String(loggedUser.email || '')
-              .trim()
-              .toLowerCase();
+      let remoteTasks: any[] = [];
+      let remoteProjects: any[] = [];
 
-            const isAssigned = Array.isArray(assigned)
-              ? assigned.map(a => String(a).trim().toLowerCase()).includes(userEmail)
-              : String(assigned).trim().toLowerCase() === userEmail;
+      try {
+        const res = await fetchTasks(identifier);
+        if (Array.isArray(res)) remoteTasks = res;
+        else if (res && Array.isArray((res as any).data)) remoteTasks = (res as any).data;
+      } catch (e) {
+        console.log('fetchTasks failed:', e);
+      }
 
-            return isAssigned && task.isStarted;
-          },
-        );
+      try {
+        const resp = await api.get('/mobile/proyek-aktif', {
+          params: { id_pengguna: identifier },
+        });
+        if (Array.isArray(resp.data)) remoteProjects = resp.data;
+      } catch (e) {
+        console.log('fetch proyek failed:', e);
+      }
 
-      setUserTasks(
-        filteredTasks,
-      );
+      let combined = [...(remoteTasks || []), ...(remoteProjects || [])];
+
+      if (!combined || combined.length === 0) {
+        // fallback to local mock filtering
+        const userEmail = String(loggedUser.email || '').trim().toLowerCase();
+
+        combined = tasks.filter(task => {
+          const assigned = task.assignedTo;
+          const isAssigned = Array.isArray(assigned)
+            ? assigned.map(a => String(a).trim().toLowerCase()).includes(userEmail)
+            : String(assigned).trim().toLowerCase() === userEmail;
+
+          return isAssigned && task.isStarted;
+        });
+      }
+
+      setUserTasks(combined);
     };
 
   // Statistik
