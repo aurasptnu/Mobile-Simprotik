@@ -52,7 +52,7 @@ export const radius = {
 };
 
 export const font = {
-  family: 'Plus Jakarta Sans',
+  family: 'PlusJakartaSans',
   fallback: 'System',
   size: {
     xs: 11,
