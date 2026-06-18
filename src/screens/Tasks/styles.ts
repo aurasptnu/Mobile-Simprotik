@@ -224,6 +224,23 @@ export const styles =
       fontSize: 13,
     },
 
+    indicatorRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 8,
+      marginTop: 10,
+    },
+
+    indicatorText: {
+      backgroundColor: '#F3F4F6',
+      color: '#4B5563',
+      borderRadius: 999,
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+      fontSize: 12,
+      fontWeight: '600',
+    },
+
     assignedByContainer: {
       flexDirection:
         'row',

@@ -10,21 +10,20 @@ import {
   TouchableOpacity,
 } from 'react-native';
 
-import Icon from 'react-native-vector-icons/Ionicons';
-
 import {
   useNavigation,
 } from '@react-navigation/native';
 
 import {
   getUser,
+  getStaffUUID,
 } from '../../storage/auth';
 
 import {
   tasks,
   fetchTasks,
 } from '../../data/tasks';
-import api from '../../services/api';
+import { getDashboard } from '../../services/mobile';
 
 import { styles } from './styles';
 
@@ -39,6 +38,8 @@ export default function HomeScreen() {
     userTasks,
     setUserTasks,
   ] = useState<any[]>([]);
+  const [dashboard, setDashboard] =
+    useState<any>(null);
 
   useEffect(() => {
     loadData();
@@ -62,33 +63,37 @@ export default function HomeScreen() {
       }
 
       setUser(loggedUser);
-      // Try backend endpoints first (ngrok), fallback to local mock data
-      const identifier = loggedUser.id || loggedUser.nip || loggedUser.email;
+      
+      // Dapatkan UUID staf dari storage
+      const staffUUID = await getStaffUUID();
+      
+      if (!staffUUID) {
+        console.log('No staff UUID found');
+        return;
+      }
 
       let remoteTasks: any[] = [];
-      let remoteProjects: any[] = [];
-
       try {
-        const res = await fetchTasks(identifier);
+        const dashboardData = await getDashboard(staffUUID);
+        setDashboard(dashboardData?.data || dashboardData);
+      } catch (e) {
+        console.log('fetch dashboard failed:', e);
+        setDashboard(null);
+      }
+
+      // Fetch tasks dari backend menggunakan UUID
+      try {
+        const res = await fetchTasks(staffUUID);
         if (Array.isArray(res)) remoteTasks = res;
         else if (res && Array.isArray((res as any).data)) remoteTasks = (res as any).data;
       } catch (e) {
         console.log('fetchTasks failed:', e);
       }
 
-      try {
-        const resp = await api.get('/mobile/proyek-aktif', {
-          params: { id_pengguna: identifier },
-        });
-        if (Array.isArray(resp.data)) remoteProjects = resp.data;
-      } catch (e) {
-        console.log('fetch proyek failed:', e);
-      }
-
-      let combined = [...(remoteTasks || []), ...(remoteProjects || [])];
+      let combined = remoteTasks || [];
 
       if (!combined || combined.length === 0) {
-        // fallback to local mock filtering
+        // fallback ke local mock jika backend kosong
         const userEmail = String(loggedUser.email || '').trim().toLowerCase();
 
         combined = tasks.filter(task => {
@@ -106,9 +111,12 @@ export default function HomeScreen() {
 
   // Statistik
   const totalTasks =
+    dashboard?.total_tugas ??
+    dashboard?.total ??
     userTasks.length;
 
   const selesai =
+    dashboard?.selesai ??
     userTasks.filter(
       item =>
         item.status ===
@@ -116,6 +124,8 @@ export default function HomeScreen() {
     ).length;
 
   const sedangBerlangsung =
+    dashboard?.sedang_berlangsung ??
+    dashboard?.sedangBerlangsung ??
     userTasks.filter(
       item =>
         item.status ===
@@ -123,6 +133,8 @@ export default function HomeScreen() {
     ).length;
 
   const dalamTinjauan =
+    dashboard?.dalam_tinjauan ??
+    dashboard?.dalamTinjauan ??
     userTasks.filter(
       item =>
         item.status ===
@@ -389,12 +401,12 @@ export default function HomeScreen() {
       {userTasks
         .sort(
           (a, b) =>
-            b.id - a.id,
+            Number(b.id) - Number(a.id),
         )
         .slice(0, 3)
         .map(task => (
           <TouchableOpacity
-            key={task.id}
+            key={`${task.kind || task.type}-${task.id}`}
             style={
               styles.taskCard
             }
@@ -452,7 +464,7 @@ export default function HomeScreen() {
                   styles.taskDeadline
                 }
               >
-                Deadline:{' '}
+                Target:{' '}
                 {
                   task.deadline
                 }

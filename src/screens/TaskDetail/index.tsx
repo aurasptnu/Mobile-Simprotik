@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {
   View,
@@ -16,36 +16,36 @@ import {
   useFocusEffect,
 } from '@react-navigation/native';
 
-import {
-  launchImageLibrary,
-} from 'react-native-image-picker';
-
+import {launchImageLibrary} from 'react-native-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { styles } from './styles';
-import { api } from '../../services/api';
-import { getUser } from '../../storage/auth';
+import {styles} from './styles';
+import {getStaffUUID} from '../../storage/auth';
+import {
+  getDocumentFileUrl,
+  getMobileTaskDetail,
+  uploadFinalDocumentation,
+} from '../../services/mobile';
 
-const profileIcon = require('../../assets/images/profile.png');
 const arrowIcon = require('../../assets/images/panah.png');
 
 export default function TaskDetailScreen() {
   const route = useRoute<any>();
   const navigation = useNavigation<any>();
-  const { task } = route.params;
+  const {task} = route.params;
 
-  const [detail, setDetail] = useState<any>(null);
-  const [dokumenExists, setDokumenExists] = useState(false);
-  const [dokumenUrl, setDokumenUrl] = useState<string | null>(null);
-  const [dokumenId, setDokumenId] = useState<any>(null);
-
+  const [detail, setDetail] = useState<any>(task);
+  const [dokumenExists, setDokumenExists] = useState(Boolean(task?.hasDocument));
+  const [dokumenUrl, setDokumenUrl] = useState<string | null>(task?.documentUrl || null);
+  const [dokumenId, setDokumenId] = useState<any>(task?.documentId || null);
   const [photo, setPhoto] = useState<string | null>(null);
-  const [surveyCompleted, setSurveyCompleted] = useState(task?.surveyCompleted ?? false);
+  const [surveyCompleted, setSurveyCompleted] = useState(Boolean(task?.surveyCompleted));
   const [showPhotoModal, setShowPhotoModal] = useState(false);
   const [showSurveyModal, setShowSurveyModal] = useState(false);
+  const [loadingDetail, setLoadingDetail] = useState(true);
+  const [uploading, setUploading] = useState(false);
 
-  const [loadingDetail, setLoadingDetail] = useState<boolean>(true);
-  const [uploading, setUploading] = useState<boolean>(false);
+  const storageKey = `${task.kind}_${task.rawId || task.id}`;
 
   useEffect(() => {
     loadDetail();
@@ -54,109 +54,103 @@ export default function TaskDetailScreen() {
   useFocusEffect(
     React.useCallback(() => {
       loadDetail();
-    }, [task.id]),
+    }, [task.rawId, task.kind]),
   );
 
   const loadDetail = async () => {
     setLoadingDetail(true);
+
     try {
-      const user = await getUser();
-      const id_pengguna = user?.id || user?.nip || user?.email;
+      const staffUUID = await getStaffUUID();
 
-      const endpoint = (task.type || '').toLowerCase().includes('proyek')
-        ? `/mobile/proyek/${task.id}`
-        : `/mobile/pekerjaan/${task.id}`;
-
-      const res = await api.get(endpoint, { params: { id_pengguna } });
-
-      if (res && res.data) {
-        setDetail(res.data);
-
-        if (res.data.sudah_ada_dokumentasi) setDokumenExists(true);
-        if (res.data.id_dokumen) setDokumenId(res.data.id_dokumen);
-        if (res.data.dokumen && (res.data.dokumen.file || res.data.dokumen.url)) {
-          setDokumenUrl(res.data.dokumen.file || res.data.dokumen.url);
-        }
-        if (res.data.sudah_ada_survei) setSurveyCompleted(true);
-      } else {
-        // fallback to local storage
-        const savedDoc = await AsyncStorage.getItem(`task_doc_${task.id}`);
-        if (savedDoc) setPhoto(savedDoc);
-        const savedSurvey = await AsyncStorage.getItem(`task_survey_${task.id}`);
-        if (savedSurvey === 'true') setSurveyCompleted(true);
+      if (!staffUUID) {
+        console.log('No staff UUID found');
+        return;
       }
+
+      const remoteDetail = await getMobileTaskDetail(task, staffUUID);
+      setDetail(remoteDetail);
+      setDokumenExists(remoteDetail.hasDocument);
+      setDokumenId(remoteDetail.documentId || null);
+      setDokumenUrl(remoteDetail.documentUrl || null);
+      setSurveyCompleted(remoteDetail.surveyCompleted);
     } catch (error) {
       console.log('loadDetail error, falling back to local storage', error);
-      try {
-        const savedDoc = await AsyncStorage.getItem(`task_doc_${task.id}`);
-        if (savedDoc) setPhoto(savedDoc);
-        const savedSurvey = await AsyncStorage.getItem(`task_survey_${task.id}`);
-        if (savedSurvey === 'true') setSurveyCompleted(true);
-      } catch (e) {
-        console.log('fallback load error', e);
-      }
     } finally {
+      try {
+        const savedDoc = await AsyncStorage.getItem(`task_doc_${storageKey}`);
+        const savedSurvey = await AsyncStorage.getItem(`task_survey_${storageKey}`);
+
+        if (savedDoc) {
+          setPhoto(savedDoc);
+          setDokumenExists(true);
+        }
+
+        if (savedSurvey === 'true') {
+          setSurveyCompleted(true);
+        }
+      } catch (error) {
+        console.log('fallback load error', error);
+      }
+
       setLoadingDetail(false);
     }
   };
 
   const handleUpload = async () => {
-    const result = await launchImageLibrary({ mediaType: 'photo', quality: 0.8 });
+    if (dokumenExists || photo) {
+      setShowPhotoModal(true);
+      return;
+    }
 
-    if (!result.assets) return;
+    if ((detail || task).status !== 'Sedang Berlangsung') {
+      return;
+    }
 
-    const uri = result.assets[0].uri || null;
-    if (!uri) return;
+    const result = await launchImageLibrary({mediaType: 'photo', quality: 0.8});
+
+    const asset = result.assets?.[0];
+    const uri = asset?.uri;
+
+    if (!uri) {
+      return;
+    }
 
     setUploading(true);
+
     try {
-      const user = await getUser();
-      const id_pengguna = user?.id || user?.nip || user?.email;
+      const staffUUID = await getStaffUUID();
 
-      const endpoint = (task.type || '').toLowerCase().includes('proyek')
-        ? `/mobile/proyek/${task.id}/dokumentasi-akhir`
-        : `/mobile/pekerjaan/${task.id}/dokumentasi-akhir`;
-
-      const form: any = new FormData();
-      form.append('id_pengguna', id_pengguna);
+      if (!staffUUID) {
+        console.log('No staff UUID found');
+        return;
+      }
 
       const filename = uri.split('/').pop() || `photo_${Date.now()}.jpg`;
-      const fileType = result.assets[0].type || 'image/jpeg';
+      const uploadRes = await uploadFinalDocumentation(task, staffUUID, {
+        uri,
+        name: filename,
+        type: asset.type || 'image/jpeg',
+      });
 
-      // @ts-ignore
-      form.append('dokumentasi_akhir', { uri, name: filename, type: fileType });
-
-      const uploadRes = await api.post(endpoint, form, { headers: { 'Content-Type': 'multipart/form-data' } });
-
-      if (uploadRes && uploadRes.data) {
-        setDokumenExists(true);
-        setDokumenId(uploadRes.data.id_dokumen || uploadRes.data.id || null);
-        if (uploadRes.data.dokumen && (uploadRes.data.dokumen.file || uploadRes.data.dokumen.url)) {
-          setDokumenUrl(uploadRes.data.dokumen.file || uploadRes.data.dokumen.url);
-        }
-        setPhoto(uri);
-        await AsyncStorage.setItem(`task_doc_${task.id}`, uri);
-      }
-    } catch (uploadErr) {
-      console.log('upload failed, saving locally', uploadErr);
+      setDokumenExists(true);
+      setDokumenId(uploadRes?.id_dokumen || uploadRes?.id || null);
+      setDokumenUrl(uploadRes?.dokumen?.file || uploadRes?.dokumen?.url || null);
       setPhoto(uri);
-      await AsyncStorage.setItem(`task_doc_${task.id}`, uri);
+      await AsyncStorage.setItem(`task_doc_${storageKey}`, uri);
+    } catch (error) {
+      console.log('upload failed, saving locally', error);
+      setDokumenExists(true);
+      setPhoto(uri);
+      await AsyncStorage.setItem(`task_doc_${storageKey}`, uri);
     } finally {
       setUploading(false);
     }
   };
 
-  const handleDocumentPress = () => {
-    if (photo || dokumenExists) {
-      setShowPhotoModal(true);
-    } else {
-      handleUpload();
-    }
-  };
-
   const saveSurveyStatus = async (status: boolean) => {
     try {
-      await AsyncStorage.setItem(`task_survey_${task.id}`, String(status));
+      await AsyncStorage.setItem(`task_survey_${storageKey}`, String(status));
       setSurveyCompleted(status);
     } catch (error) {
       console.log('Error saving survey:', error);
@@ -164,22 +158,29 @@ export default function TaskDetailScreen() {
   };
 
   const handleSurvey = () => {
-    if (!surveyCompleted) {
-      navigation.navigate('Survey', { taskId: task.id, taskType: task.type, onSurveyComplete: () => saveSurveyStatus(true) });
-    } else {
+    if (surveyCompleted) {
       setShowSurveyModal(true);
+      return;
     }
+
+    if (!dokumenExists && !photo) {
+      return;
+    }
+
+    navigation.navigate('Survey', {
+      task: detail || task,
+      onSurveyComplete: () => saveSurveyStatus(true),
+    });
   };
 
-  const staffList =
-    Array.isArray(
-      task.assignedTo,
-    )
-      ? task.assignedTo
-      : [task.assignedTo];
+  const visibleTask = detail || task;
+  const documentUri = photo || dokumenUrl || (dokumenId ? getDocumentFileUrl(dokumenId) : '');
+  const canFillSurvey = surveyCompleted || dokumenExists || Boolean(photo);
+  const canUploadDocument = visibleTask.status === 'Sedang Berlangsung' && !dokumenExists && !photo;
+
   if (loadingDetail) {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
         <ActivityIndicator size="large" color="#2563EB" />
       </View>
     );
@@ -187,17 +188,14 @@ export default function TaskDetailScreen() {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => navigation.goBack()}
-      >
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Image
           source={arrowIcon}
           style={{
             width: 18,
             height: 18,
             tintColor: '#2563EB',
-            transform: [{ scaleX: -1 }],
+            transform: [{scaleX: -1}],
           }}
         />
       </TouchableOpacity>
@@ -205,357 +203,112 @@ export default function TaskDetailScreen() {
       <View style={styles.headerRow}>
         <View style={styles.statusBadge}>
           <Text style={styles.statusText}>
-            {task.status === 'Dalam Tinjauan'
+            {visibleTask.status === 'Dalam Tinjauan'
               ? 'Menunggu ACC Kepala Divisi'
-              : task.status === 'Selesai'
-              ? 'Selesai'
-              : task.status}
+              : visibleTask.status}
           </Text>
         </View>
       </View>
 
-      <Text
-        style={
-          styles.title
-        }
-      >
-        {task.title}
-      </Text>
+      <Text style={styles.title}>{visibleTask.title}</Text>
 
-      <View
-        style={
-          styles.card
-        }
-      >
-        <Text
-          style={
-            styles.label
-          }
-        >
-          Tipe
-        </Text>
-        <Text
-          style={
-            styles.value
-          }
-        >
-          {task.type || 'Pekerjaan'}
-        </Text>
+      <View style={styles.card}>
+        <Text style={styles.label}>Tipe</Text>
+        <Text style={styles.value}>{visibleTask.type || 'Pekerjaan'}</Text>
       </View>
 
-      <View
-        style={
-          styles.card
-        }
-      >
-        <Text
-          style={
-            styles.label
-          }
-        >
-          Unit Peminta
-        </Text>
-        <Text
-          style={
-            styles.value
-          }
-        >
-          {task.assignedBy || '-'}
-        </Text>
+      <View style={styles.card}>
+        <Text style={styles.label}>Unit Peminta</Text>
+        <Text style={styles.value}>{visibleTask.assignedBy || '-'}</Text>
       </View>
 
-      <View
-        style={
-          styles.card
-        }
-      >
-        <Text
-          style={
-            styles.label
-          }
-        >
-          Lokasi
-        </Text>
-        <Text
-          style={
-            styles.value
-          }
-        >
-          {task.location || '-'}
-        </Text>
+      <View style={styles.card}>
+        <Text style={styles.label}>Lokasi</Text>
+        <Text style={styles.value}>{visibleTask.location || '-'}</Text>
       </View>
 
-      <View
-        style={
-          styles.card
-        }
-      >
-        <Text
-          style={
-            styles.label
-          }
-        >
-          Deadline
-        </Text>
-        <Text
-          style={
-            styles.value
-          }
-        >
-          {task.deadline}
-        </Text>
+      <View style={styles.card}>
+        <Text style={styles.label}>Target Selesai</Text>
+        <Text style={styles.value}>{visibleTask.deadline || '-'}</Text>
       </View>
 
-      <View
-        style={
-          styles.card
-        }
-      >
-        <Text
-          style={
-            styles.label
-          }
-        >
-          Deskripsi
-        </Text>
-        <Text
-          style={
-            styles.description
-          }
-        >
-          {task.description}
-        </Text>
+      <View style={styles.card}>
+        <Text style={styles.label}>Deskripsi</Text>
+        <Text style={styles.description}>{visibleTask.description || '-'}</Text>
       </View>
 
-      <View
-        style={
-          styles.card
-        }
-      >
-        <Text
-          style={
-            styles.label
-          }
-        >
-          Daftar Staf
-        </Text>
-        {staffList.map(
-          (staff: string, index: number) => (
-            <Text
-              key={index}
-              style={
-                styles.value
-              }
-            >
-              {staff}
-            </Text>
-          ),
-        )}
-      </View>
-
-      <View
-        style={
-          styles.card
-        }
-      >
-        <Text
-          style={
-            styles.label
-          }
-        >
-          Dokumentasi Akhir
-        </Text>
-        <Text
-          style={
-            styles.subText
-          }
-        >
-          {photo
+      <View style={styles.card}>
+        <Text style={styles.label}>Dokumentasi Akhir</Text>
+        <Text style={styles.subText}>
+          {dokumenExists || photo
             ? 'Sudah upload dokumentasi'
-            : 'Belum upload dokumentasi'}
+            : canUploadDocument
+            ? 'Belum upload dokumentasi'
+            : 'Upload dokumen hanya saat Sedang Berlangsung'}
         </Text>
         <TouchableOpacity
-          style={styles.actionButton}
-          onPress={handleDocumentPress}
-          disabled={uploading}
-        >
+          style={[styles.actionButton, !canUploadDocument && !dokumenExists && !photo && {backgroundColor: '#9CA3AF'}]}
+          onPress={handleUpload}
+          disabled={uploading || (!canUploadDocument && !dokumenExists && !photo)}>
           {uploading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={styles.actionButtonText}>{photo ? 'Lihat Dokumen' : 'Upload Dokumentasi'}</Text>
+            <Text style={styles.actionButtonText}>
+              {dokumenExists || photo ? 'Lihat Dokumen' : 'Upload Dokumentasi'}
+            </Text>
           )}
         </TouchableOpacity>
       </View>
 
-      <View
-        style={
-          styles.card
-        }
-      >
-        <Text
-          style={
-            styles.label
-          }
-        >
-          Survei Klien
-        </Text>
-        <Text
-          style={
-            styles.subText
-          }
-        >
+      <View style={styles.card}>
+        <Text style={styles.label}>Survei Klien</Text>
+        <Text style={styles.subText}>
           {surveyCompleted
             ? 'Sudah isi survei'
-            : 'Belum isi survei'}
+            : canFillSurvey
+            ? 'Belum isi survei'
+            : 'Upload dokumentasi terlebih dahulu'}
         </Text>
         <TouchableOpacity
-          style={
-            styles.actionButton
-          }
-          onPress={
-            handleSurvey
-          }
-        >
-          <Text
-            style={
-              styles.actionButtonText
-            }
-          >
-            {surveyCompleted
-              ? 'Lihat Survei'
-              : 'Isi Survei'}
+          style={[styles.actionButton, !canFillSurvey && {backgroundColor: '#9CA3AF'}]}
+          onPress={handleSurvey}
+          disabled={!canFillSurvey}>
+          <Text style={styles.actionButtonText}>
+            {surveyCompleted ? 'Lihat Survei' : 'Isi Survei'}
           </Text>
         </TouchableOpacity>
       </View>
 
       <Modal
-        visible={
-          showPhotoModal
-        }
+        visible={showPhotoModal}
         transparent={true}
-        onRequestClose={() =>
-          setShowPhotoModal(
-            false,
-          )
-        }
-      >
-        <View
-          style={
-            styles.modalOverlay
-          }
-        >
-          <View
-            style={
-              styles.modalContent
-            }
-          >
-            <TouchableOpacity
-              style={
-                styles.closeButton
-              }
-              onPress={() =>
-                setShowPhotoModal(
-                  false,
-                )
-              }
-            >
-              <Text
-                style={
-                  styles.closeButtonText
-                }
-              >
-                ✕
-              </Text>
+        onRequestClose={() => setShowPhotoModal(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <TouchableOpacity style={styles.closeButton} onPress={() => setShowPhotoModal(false)}>
+              <Text style={styles.closeButtonText}>X</Text>
             </TouchableOpacity>
 
-            <Image
-              source={{
-                uri: photo ||
-                  '',
-              }}
-              style={
-                styles.fullImage
-              }
-              resizeMode="contain"
-            />
+            <Image source={{uri: documentUri}} style={styles.fullImage} resizeMode="contain" />
           </View>
         </View>
       </Modal>
 
       <Modal
-        visible={
-          showSurveyModal
-        }
+        visible={showSurveyModal}
         transparent={true}
-        onRequestClose={() =>
-          setShowSurveyModal(
-            false,
-          )
-        }
-      >
-        <View
-          style={
-            styles.modalOverlay
-          }
-        >
-          <View
-            style={
-              styles.surveyModalContent
-            }
-          >
-            <TouchableOpacity
-              style={
-                styles.closeButton
-              }
-              onPress={() =>
-                setShowSurveyModal(
-                  false,
-                )
-              }
-            >
-              <Text
-                style={
-                  styles.closeButtonText
-                }
-              >
-                ✕
-              </Text>
+        onRequestClose={() => setShowSurveyModal(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.surveyModalContent}>
+            <TouchableOpacity style={styles.closeButton} onPress={() => setShowSurveyModal(false)}>
+              <Text style={styles.closeButtonText}>X</Text>
             </TouchableOpacity>
 
-            <Text
-              style={
-                styles.surveyTitle
-              }
-            >
-              Survei Klien
-            </Text>
+            <Text style={styles.surveyTitle}>Survei Klien</Text>
+            <Text style={styles.surveyStatus}>Survei sudah diselesaikan</Text>
 
-            <Text
-              style={
-                styles.surveyStatus
-              }
-            >
-              ✓ Survei sudah
-              diselesaikan
-            </Text>
-
-            <TouchableOpacity
-              style={
-                styles.surveyCloseBtn
-              }
-              onPress={() =>
-                setShowSurveyModal(
-                  false,
-                )
-              }
-            >
-              <Text
-                style={
-                  styles.surveyCloseBtnText
-                }
-              >
-                Tutup
-              </Text>
+            <TouchableOpacity style={styles.surveyCloseBtn} onPress={() => setShowSurveyModal(false)}>
+              <Text style={styles.surveyCloseBtnText}>Tutup</Text>
             </TouchableOpacity>
           </View>
         </View>

@@ -23,6 +23,7 @@ import {
 
 import {
   getUser,
+  getStaffUUID,
 } from '../../storage/auth';
 
 import {
@@ -33,8 +34,6 @@ import {
 import { styles } from './styles';
 
 const arrowIcon = require('../../assets/images/panah.png');
-const profileIcon = require('../../assets/images/profile.png');
-
 export default function TasksScreen() {
   const navigation =
     useNavigation<any>();
@@ -96,12 +95,20 @@ export default function TasksScreen() {
           return;
         }
 
+        // Dapatkan UUID staf dari storage
+        const staffUUID = await getStaffUUID();
+        
+        if (!staffUUID) {
+          console.log('No staff UUID found');
+          setFilteredTasks([]);
+          return;
+        }
+
         // Try fetching from backend first; fallback to local mock tasks
         let myTasks: any[] = [];
 
         try {
-          const identifier = user.id || user.nip || user.email;
-          const remote = await fetchTasks(identifier);
+          const remote = await fetchTasks(staffUUID);
 
           if (Array.isArray(remote)) {
             myTasks = remote;
@@ -322,7 +329,15 @@ export default function TasksScreen() {
             styles.taskInfo
           }
         >
-          Ditugaskan oleh: {item.assignedBy}
+          Unit peminta: {item.assignedBy}
+        </Text>
+
+        <Text
+          style={
+            styles.taskInfo
+          }
+        >
+          Lokasi: {item.location || '-'}
         </Text>
 
         <Text
@@ -330,8 +345,17 @@ export default function TasksScreen() {
             styles.deadline
           }
         >
-          Deadline: {item.deadline}
+          Target selesai: {item.deadline}
         </Text>
+
+        <View style={styles.indicatorRow}>
+          <Text style={styles.indicatorText}>
+            Dokumen: {item.hasDocument ? 'Ada' : 'Belum'}
+          </Text>
+          <Text style={styles.indicatorText}>
+            Survei: {item.surveyCompleted ? 'Ada' : 'Belum'}
+          </Text>
+        </View>
       </TouchableOpacity>
     );
 
@@ -476,7 +500,7 @@ export default function TasksScreen() {
           renderTask
         }
         keyExtractor={item =>
-          item.id.toString()
+          `${item.kind || item.type}-${item.id}`
         }
         showsVerticalScrollIndicator={
           false

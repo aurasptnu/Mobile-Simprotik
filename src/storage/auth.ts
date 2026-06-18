@@ -72,11 +72,62 @@ export const getUser = async () => {
   return null;
 };
 
+// Save staff UUID from backend
+export const saveStaffUUID = async (uuid: string) => {
+  // Try MMKV first
+  if (mmkvStore) {
+    try {
+      mmkvStore.set('staffUUID', uuid);
+      return;
+    } catch (e) {
+      console.log('MMKV SAVE UUID ERROR:', e);
+    }
+  }
+
+  // Fallback to AsyncStorage
+  try {
+    await AsyncStorage.setItem('staffUUID', uuid);
+    return;
+  } catch (error) {
+    console.log('SAVE UUID ERROR (AsyncStorage), using fallback:', error);
+    inMemoryStore['staffUUID'] = uuid;
+  }
+};
+
+// Get staff UUID from storage
+export const getStaffUUID = async (): Promise<string | null> => {
+  // Try MMKV first
+  if (mmkvStore) {
+    try {
+      const v = mmkvStore.getString('staffUUID');
+      if (v) return v;
+    } catch (e) {
+      console.log('MMKV GET UUID ERROR:', e);
+    }
+  }
+
+  // Try AsyncStorage
+  try {
+    const uuid = await AsyncStorage.getItem('staffUUID');
+    if (uuid) return uuid;
+  } catch (error) {
+    console.log('GET UUID ERROR (AsyncStorage), using fallback:', error);
+  }
+
+  // In-memory fallback
+  if (inMemoryStore['staffUUID']) {
+    return inMemoryStore['staffUUID'];
+  }
+
+  return null;
+};
+
 export const logoutUser = async () => {
   // Try MMKV
   if (mmkvStore) {
     try {
       mmkvStore.remove('loggedUser');
+      mmkvStore.remove('staffUUID');
     } catch (e) {
       console.log('MMKV DELETE ERROR:', e);
     }
@@ -85,10 +136,12 @@ export const logoutUser = async () => {
   // Try AsyncStorage
   try {
     await AsyncStorage.removeItem('loggedUser');
+    await AsyncStorage.removeItem('staffUUID');
   } catch (error) {
     console.log('LOGOUT ERROR (AsyncStorage):', error);
   }
 
   // always clear fallback
   delete inMemoryStore['loggedUser'];
+  delete inMemoryStore['staffUUID'];
 };

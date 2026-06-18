@@ -1,4 +1,4 @@
 // Config API untuk mobile frontend
-export const API_BASE_URL = 'https://scooter-coerce-reunite.ngrok-free.dev/api';
+export const API_BASE_URL = 'http://127.0.0.1:8000/api';
 
 export default API_BASE_URL;

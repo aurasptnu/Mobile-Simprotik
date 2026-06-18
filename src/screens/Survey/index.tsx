@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {
   Alert,
@@ -16,19 +16,23 @@ import {
   useRoute,
 } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { api } from '../../services/api';
-import { getUser } from '../../storage/auth';
+import { getStaffUUID } from '../../storage/auth';
 
 import { addSurveyResponse } from '../../data/survey';
 import { surveyQuestions } from '../../data/surveyQuestions';
 import { styles } from './styles';
+import {
+  getSurveyQuestions,
+  MobileSurveyQuestion,
+  submitTaskSurvey,
+} from '../../services/mobile';
 
 const arrowIcon = require('../../assets/images/panah.png');
 
 export default function SurveyScreen() {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
-  const { taskId, taskType, onSurveyComplete } = route.params || {};
+  const { task, onSurveyComplete } = route.params || {};
 
   // answers keyed by question id
   const [answers, setAnswers] = useState<{[k:string]: string}>({});
@@ -36,6 +40,28 @@ export default function SurveyScreen() {
   const [nama, setNama] = useState('');
   const [nip, setNip] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [questions, setQuestions] = useState<MobileSurveyQuestion[]>(surveyQuestions);
+  const [loadingQuestions, setLoadingQuestions] = useState(false);
+
+  useEffect(() => {
+    loadQuestions();
+  }, []);
+
+  const loadQuestions = async () => {
+    setLoadingQuestions(true);
+
+    try {
+      const remoteQuestions = await getSurveyQuestions();
+
+      if (remoteQuestions.length > 0) {
+        setQuestions(remoteQuestions);
+      }
+    } catch (error) {
+      console.log('load survey questions failed, using local fallback', error);
+    } finally {
+      setLoadingQuestions(false);
+    }
+  };
 
   const submitSurvey = async () => {
     setSubmitting(true);
@@ -52,9 +78,10 @@ export default function SurveyScreen() {
     }
 
     // ensure all choice questions answered
-    const choiceQuestions = surveyQuestions.filter(q => q.type === 'choice');
+    const choiceQuestions = questions.filter(q => q.type === 'choice').slice(0, 5);
     const missing = choiceQuestions.find(q => !answers[q.id]);
     if (missing) {
+      setSubmitting(false);
       Alert.alert('Perhatian', 'Harap jawab semua pertanyaan survey terlebih dahulu.');
       return;
     }
@@ -71,30 +98,29 @@ export default function SurveyScreen() {
     await addSurveyResponse(newSurvey);
 
     // if invoked from TaskDetail with taskId, try submit to backend
-    if (taskId) {
+    if (task) {
       try {
-        const user = await getUser();
-        const id_pengguna = user?.id || user?.nip || user?.email;
+        const staffUUID = await getStaffUUID();
+        
+        if (!staffUUID) {
+          console.log('No staff UUID found for survey submission');
+        } else {
+          const payload = {
+            id_pengguna: staffUUID,
+            nama_klien: nama,
+            nip_klien: nip,
+            jawaban1: Number(answers[choiceQuestions[0].id]),
+            jawaban2: Number(answers[choiceQuestions[1].id]),
+            jawaban3: Number(answers[choiceQuestions[2].id]),
+            jawaban4: Number(answers[choiceQuestions[3].id]),
+            jawaban5: Number(answers[choiceQuestions[4].id]),
+            jawaban6: comment || '',
+          };
 
-        const payload: any = {
-          id_pengguna,
-          nama_klien: nama,
-          nip_klien: nip,
-          jawaban1: answers['q1'] || '',
-          jawaban2: answers['q2'] || '',
-          jawaban3: answers['q3'] || '',
-          jawaban4: answers['q4'] || '',
-          jawaban5: answers['q5'] || '',
-          jawaban6: comment || '',
-        };
+          await submitTaskSurvey(task, payload);
 
-        const endpoint = (taskType || '').toLowerCase().includes('proyek')
-          ? `/mobile/proyek/${taskId}/survei`
-          : `/mobile/pekerjaan/${taskId}/survei`;
-
-        await api.post(endpoint, payload);
-
-        await AsyncStorage.setItem(`task_survey_${taskId}`, 'true');
+          await AsyncStorage.setItem(`task_survey_${task.kind}_${task.rawId || task.id}`, 'true');
+        }
       } catch (err) {
         console.log('submitSurvey backend error', err);
       }
@@ -139,7 +165,7 @@ export default function SurveyScreen() {
           }}
         />
       </TouchableOpacity>
-      <Text style={styles.header}>Survey Pekerjaan</Text>
+      <Text style={styles.header}>Survei Klien</Text>
 
       {/* Personal Info Section */}
       <View style={styles.card}>
@@ -172,7 +198,13 @@ export default function SurveyScreen() {
         <Text style={styles.scaleInfo}>5 = Sangat Puas</Text>
       </View>
 
-      {surveyQuestions.map((q, idx) => (
+      {loadingQuestions && (
+        <View style={styles.card}>
+          <ActivityIndicator color="#2563EB" />
+        </View>
+      )}
+
+      {questions.map((q, idx) => (
         <View key={q.id} style={styles.card}>
           <Text style={styles.question}>{idx+1}. {q.text}</Text>
 
