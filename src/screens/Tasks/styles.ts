@@ -46,7 +46,7 @@ export const styles =
     },
 
     searchInput: {
-      fontSize: 14,
+      fontSize: font.size.base,
       color: colors.text,
       flex: 1,
       minHeight: 44,
@@ -90,7 +90,7 @@ export const styles =
 
     filterOptionText: {
       color: colors.text,
-      fontSize: 14,
+      fontSize: font.size.base,
     },
 
     activeOptionText: {
@@ -150,19 +150,24 @@ export const styles =
       borderRadius: radius.full,
     },
 
-    orangeBadge: {
+    blueBadge: {
       backgroundColor:
-        colors.goldLight,
+        colors.primaryBlue,
     },
 
-    yellowBadge: {
+    orangeBadge: {
       backgroundColor:
-        '#FFF7ED',
+        colors.orange,
     },
 
     greenBadge: {
       backgroundColor:
-        '#DCFCE7',
+        colors.success,
+    },
+
+    purpleBadge: {
+      backgroundColor:
+        colors.purple,
     },
 
     grayBadge: {
@@ -171,15 +176,15 @@ export const styles =
     },
 
     badgeText: {
-      fontSize: 11,
+      fontSize: font.size.xs,
       fontWeight:
         font.weight.bold,
       color:
-        colors.text,
+        colors.white,
     },
 
     taskTitle: {
-      fontSize: 16,
+      fontSize: font.size.lg,
       fontWeight:
         font.weight.bold,
       color:
@@ -188,14 +193,14 @@ export const styles =
     },
 
     taskInfo: {
-      fontSize: 14,
+      fontSize: font.size.base,
       color: colors.textSoft,
       marginBottom: 6,
     },
 
     deadline: {
       color: colors.textMuted,
-      fontSize: 13,
+      fontSize: font.size.sm,
     },
 
     indicatorRow: {
@@ -211,7 +216,7 @@ export const styles =
       borderRadius: radius.full,
       paddingHorizontal: 10,
       paddingVertical: 5,
-      fontSize: 12,
+      fontSize: font.size.sm,
       fontWeight: font.weight.semibold,
     },
 
@@ -226,13 +231,13 @@ export const styles =
     profileImage: {
       width: 20,
       height: 20,
-      borderRadius: 10,
+      borderRadius: radius.md,
       marginRight: 8,
       resizeMode: 'contain',
     },
 
     assignedByText: {
-      fontSize: 13,
+      fontSize: font.size.sm,
       color: colors.textSoft,
       fontWeight: font.weight.medium,
     },

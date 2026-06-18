@@ -43,7 +43,7 @@ export const styles =
       marginTop: 6,
       textAlign: 'center',
       color: colors.textSoft,
-      fontSize: 14,
+      fontSize: font.size.base,
     },
 
     card: {
@@ -71,7 +71,7 @@ export const styles =
     },
 
     label: {
-      fontSize: 14,
+      fontSize: font.size.base,
       fontWeight:
         font.weight.semibold,
       marginBottom: 8,
@@ -110,14 +110,14 @@ export const styles =
         'center',
       fontWeight:
         font.weight.bold,
-      fontSize: 16,
+      fontSize: font.size.lg,
     },
 
     footer: {
       textAlign: 'center',
       marginTop: 30,
       color: colors.textMuted,
-      fontSize: 12,
+      fontSize: font.size.sm,
     },
 
     modalOverlay: {
@@ -150,7 +150,7 @@ export const styles =
     },
 
     modalTitle: {
-      fontSize: 22,
+      fontSize: font.size.modalTitle,
       fontWeight: font.weight.extrabold,
       color: colors.text,
     },
@@ -163,7 +163,7 @@ export const styles =
     modalCloseButton: {
       width: 38,
       height: 38,
-      borderRadius: 19,
+      borderRadius: radius.full,
       backgroundColor: colors.surface2,
       alignItems: 'center',
       justifyContent: 'center',
@@ -172,7 +172,7 @@ export const styles =
     modalCloseText: {
       color: colors.text,
       fontWeight: font.weight.bold,
-      fontSize: 16,
+      fontSize: font.size.lg,
     },
 
     staffList: {
@@ -193,7 +193,7 @@ export const styles =
     staffAvatar: {
       width: 42,
       height: 42,
-      borderRadius: 21,
+      borderRadius: radius.full,
       backgroundColor: colors.gold,
       alignItems: 'center',
       justifyContent: 'center',
@@ -203,7 +203,7 @@ export const styles =
     staffAvatarText: {
       color: colors.text,
       fontWeight: font.weight.bold,
-      fontSize: 18,
+      fontSize: font.size.cardTitle,
     },
 
     staffInfo: {
@@ -214,19 +214,19 @@ export const styles =
     staffName: {
       color: colors.text,
       fontWeight: font.weight.bold,
-      fontSize: 15,
+      fontSize: font.size.md,
       marginBottom: 4,
     },
 
     staffMeta: {
       color: colors.textSoft,
-      fontSize: 12,
+      fontSize: font.size.sm,
       lineHeight: 17,
     },
 
     staffNip: {
       color: colors.textMuted,
-      fontSize: 12,
+      fontSize: font.size.sm,
       marginTop: 4,
     },
 
@@ -249,7 +249,7 @@ export const styles =
 
     modalError: {
       color: colors.danger,
-      backgroundColor: '#FEF2F2',
+      backgroundColor: colors.dangerLight,
       borderRadius: radius.md,
       paddingHorizontal: 12,
       paddingVertical: 10,

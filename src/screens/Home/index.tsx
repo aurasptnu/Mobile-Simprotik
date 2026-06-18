@@ -244,7 +244,7 @@ export default function HomeScreen() {
         <View
           style={[
             styles.statCard,
-            { backgroundColor: '#FFF7ED' },
+            { backgroundColor: colors.orangeLight },
           ]}
         >
           <Text
@@ -270,7 +270,7 @@ export default function HomeScreen() {
         <View
           style={[
             styles.statCard,
-            { backgroundColor: '#ECFDF5' },
+            { backgroundColor: colors.successLight },
           ]}
         >
           <Text

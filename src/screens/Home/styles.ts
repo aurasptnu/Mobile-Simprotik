@@ -25,7 +25,7 @@ export const styles =
     },
 
     welcome: {
-      fontSize: 13,
+      fontSize: font.size.sm,
       color: colors.textMuted,
       fontWeight: font.weight.medium,
     },
@@ -41,7 +41,7 @@ export const styles =
     notifButton: {
       width: 48,
       height: 48,
-      borderRadius: 24,
+      borderRadius: radius.xxl,
       backgroundColor:
         colors.white,
       justifyContent:
@@ -105,7 +105,7 @@ export const styles =
     },
 
     sectionTitle: {
-      fontSize: 12,
+      fontSize: font.size.sm,
       fontWeight:
         font.weight.bold,
       color: colors.textMuted,
@@ -139,14 +139,14 @@ export const styles =
     },
 
     progressTitle: {
-      fontSize: 18,
+      fontSize: font.size.cardTitle,
       fontWeight:
         font.weight.semibold,
       color: colors.text,
     },
 
     progressPercent: {
-      fontSize: 20,
+      fontSize: font.size.xl,
       fontWeight:
         font.weight.bold,
       color: colors.primaryBlue,
@@ -157,7 +157,7 @@ export const styles =
       height: 8,
       backgroundColor:
         colors.surface2,
-      borderRadius: 999,
+      borderRadius: radius.full,
       marginTop: 18,
     },
 
@@ -165,17 +165,17 @@ export const styles =
       height: 8,
       backgroundColor:
         colors.primaryBlue,
-      borderRadius: 999,
+      borderRadius: radius.full,
     },
 
     progressText: {
       marginTop: 14,
       color: colors.textMuted,
-      fontSize: 13,
+      fontSize: font.size.sm,
     },
 
     progressText2: {
-      fontSize: 16,
+      fontSize: font.size.lg,
       fontWeight:
         font.weight.semibold,
       color: colors.text,
@@ -185,7 +185,7 @@ export const styles =
       color: colors.info,
       fontWeight:
         font.weight.semibold,
-      fontSize: 13,
+      fontSize: font.size.sm,
     },
 
     notificationCard: {
@@ -195,7 +195,7 @@ export const styles =
     },
 
     notificationTitle: {
-      fontSize: 16,
+      fontSize: font.size.lg,
       fontWeight:
         font.weight.bold,
       color: colors.text,
@@ -203,7 +203,7 @@ export const styles =
     },
 
     notificationDesc: {
-      fontSize: 13,
+      fontSize: font.size.sm,
       color: colors.textSoft,
       lineHeight: 18,
     },
@@ -222,7 +222,7 @@ export const styles =
     },
 
     taskTitle: {
-      fontSize: 15,
+      fontSize: font.size.md,
       fontWeight:
         font.weight.bold,
       color: colors.text,
@@ -231,7 +231,7 @@ export const styles =
 
     taskDesc: {
       color: colors.textMuted,
-      fontSize: 13,
+      fontSize: font.size.sm,
     },
 
     taskInfoRow: {
@@ -240,7 +240,7 @@ export const styles =
 
     taskInfo: {
       color: colors.textSoft,
-      fontSize: 13,
+      fontSize: font.size.sm,
       fontWeight:
         '500',
     },
@@ -256,13 +256,13 @@ export const styles =
 
     taskStatus: {
       color: colors.primaryBlue,
-      fontSize: 12,
+      fontSize: font.size.sm,
       fontWeight:
         '600',
     },
 
     taskDeadline: {
       color: colors.textMuted,
-      fontSize: 12,
+      fontSize: font.size.sm,
     },
   });

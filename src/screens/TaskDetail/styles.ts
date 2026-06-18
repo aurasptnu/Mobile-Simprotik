@@ -29,7 +29,7 @@ export const styles = StyleSheet.create({
   },
 
   priorityBadge: {
-    backgroundColor: '#FEF2F2',
+    backgroundColor: colors.dangerLight,
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: radius.full,
@@ -185,7 +185,7 @@ export const styles = StyleSheet.create({
   },
 
   closeButtonText: {
-    fontSize: 24,
+    fontSize: font.size.xxl,
     color: colors.white,
     fontWeight: font.weight.bold,
   },

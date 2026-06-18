@@ -32,7 +32,7 @@ import {
 } from '../../data/tasks';
 
 import { styles } from './styles';
-import {colors} from '../../theme';
+import {colors, font} from '../../theme';
 
 const arrowIcon = require('../../assets/images/panah.png');
 export default function TasksScreen() {
@@ -243,13 +243,16 @@ export default function TasksScreen() {
         status
       ) {
         case 'Sedang Berlangsung':
-          return styles.orangeBadge;
+          return styles.blueBadge;
 
         case 'Dalam Tinjauan':
-          return styles.yellowBadge;
+          return styles.orangeBadge;
 
         case 'Selesai':
           return styles.greenBadge;
+
+        case 'Ditugaskan':
+          return styles.purpleBadge;
 
         default:
           return styles.grayBadge;
@@ -479,7 +482,7 @@ export default function TasksScreen() {
           <Text
             style={{
               color: colors.textSoft,
-              fontSize: 16,
+              fontSize: font.size.lg,
             }}
           >
             Belum ada tugas untuk user ini.

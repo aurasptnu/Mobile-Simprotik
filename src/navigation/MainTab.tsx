@@ -76,7 +76,7 @@ export default function MainTab() {
           colors.textMuted,
 
         tabBarLabelStyle: {
-          fontSize: 12,
+          fontSize: font.size.sm,
           fontWeight:
             font.weight.semibold,
           marginBottom: 6,

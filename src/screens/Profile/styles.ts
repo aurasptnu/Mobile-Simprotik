@@ -25,28 +25,28 @@ export const styles =
     },
 
     avatarText: {
-      fontSize: 40,
+      fontSize: font.size.avatar,
       fontWeight:
         font.weight.extrabold,
       color: colors.text,
     },
 
     name: {
-      fontSize: 24,
+      fontSize: font.size.xxl,
       fontWeight: font.weight.extrabold,
       marginTop: 20,
       color: colors.text,
     },
 
     email: {
-      fontSize: 15,
+      fontSize: font.size.md,
       color: colors.textSoft,
       marginTop: 8,
       textAlign: 'center',
     },
 
     sectionTitle: {
-      fontSize: 16,
+      fontSize: font.size.lg,
       fontWeight: font.weight.bold,
       color: colors.text,
       marginBottom: 18,
@@ -61,7 +61,7 @@ export const styles =
 
     screenTitle: {
       width: '100%',
-      fontSize: 28,
+      fontSize: font.size.display,
       fontWeight: font.weight.extrabold,
       color: colors.text,
       marginBottom: 16,
@@ -81,7 +81,7 @@ export const styles =
 
     statusPill: {
       marginTop: 14,
-      backgroundColor: '#DCFCE7',
+      backgroundColor: colors.successLight,
       paddingHorizontal: 12,
       paddingVertical: 6,
       borderRadius: radius.full,
@@ -89,7 +89,7 @@ export const styles =
 
     statusText: {
       color: colors.successDark,
-      fontSize: 12,
+      fontSize: font.size.sm,
       fontWeight: font.weight.bold,
     },
 
@@ -115,13 +115,13 @@ export const styles =
 
     detailLabel: {
       color: colors.textSoft,
-      fontSize: 14,
+      fontSize: font.size.base,
     },
 
     detailValue: {
       color: colors.text,
       fontWeight: font.weight.semibold,
-      fontSize: 14,
+      fontSize: font.size.base,
       maxWidth: '60%',
       textAlign: 'right',
     },
@@ -133,12 +133,12 @@ export const styles =
     label: {
       color: colors.textSoft,
       marginBottom: 5,
-      fontSize: 14,
+      fontSize: font.size.base,
     },
 
     value: {
       fontWeight: font.weight.bold,
-      fontSize: 16,
+      fontSize: font.size.lg,
       color: colors.text,
     },
 
@@ -149,13 +149,13 @@ export const styles =
       borderRadius: radius.lg,
       marginTop: 30,
       borderWidth: 1,
-      borderColor: '#FCA5A5',
+      borderColor: colors.dangerBorder,
     },
 
     logoutText: {
       color: colors.danger,
       textAlign: 'center',
       fontWeight: font.weight.bold,
-      fontSize: 16,
+      fontSize: font.size.lg,
     },
   });

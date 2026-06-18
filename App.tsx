@@ -6,13 +6,18 @@ import {colors, font} from './src/theme';
 
 (Text as any).defaultProps = (Text as any).defaultProps || {};
 (Text as any).defaultProps.style = [
-  {fontFamily: font.family, color: colors.text, fontSize: 14, lineHeight: 22},
+  {
+    fontFamily: font.family,
+    color: colors.text,
+    fontSize: font.size.base,
+    lineHeight: font.lineHeight.base,
+  },
   (Text as any).defaultProps.style,
 ];
 
 (TextInput as any).defaultProps = (TextInput as any).defaultProps || {};
 (TextInput as any).defaultProps.style = [
-  {fontFamily: font.family, color: colors.text, fontSize: 14},
+  {fontFamily: font.family, color: colors.text, fontSize: font.size.base},
   (TextInput as any).defaultProps.style,
 ];
 
