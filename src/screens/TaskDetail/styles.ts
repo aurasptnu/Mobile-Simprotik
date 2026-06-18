@@ -208,10 +208,11 @@ export const styles =
 
     surveyModalContent: {
       width: '85%',
+      maxHeight: '82%',
       backgroundColor:
         '#fff',
       borderRadius: 24,
-      padding: 32,
+      padding: 24,
       position: 'relative',
       alignItems: 'center',
     },
@@ -230,6 +231,72 @@ export const styles =
       marginBottom: 32,
       textAlign: 'center',
       lineHeight: 24,
+    },
+
+    surveyResultScroll: {
+      width: '100%',
+      maxHeight: 420,
+      marginBottom: 20,
+    },
+
+    surveyMetaBox: {
+      width: '100%',
+      backgroundColor: '#F3F6FB',
+      borderRadius: 16,
+      padding: 14,
+      marginBottom: 12,
+    },
+
+    surveyMetaLabel: {
+      fontSize: 12,
+      color: '#6B7280',
+      marginBottom: 4,
+    },
+
+    surveyMetaValue: {
+      fontSize: 15,
+      color: '#111827',
+      fontWeight: 'bold',
+      marginBottom: 10,
+    },
+
+    surveyAnswerRow: {
+      width: '100%',
+      borderBottomWidth: 1,
+      borderBottomColor: '#E5E7EB',
+      paddingVertical: 12,
+    },
+
+    surveyQuestionText: {
+      fontSize: 14,
+      color: '#374151',
+      lineHeight: 20,
+      marginBottom: 8,
+    },
+
+    surveyAnswerValue: {
+      alignSelf: 'flex-start',
+      minWidth: 38,
+      textAlign: 'center',
+      backgroundColor: '#DBEAFE',
+      color: '#1D4ED8',
+      fontWeight: 'bold',
+      borderRadius: 14,
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+    },
+
+    surveyCommentBox: {
+      width: '100%',
+      backgroundColor: '#F9FAFB',
+      borderRadius: 16,
+      padding: 14,
+      marginTop: 12,
+    },
+
+    surveyCommentText: {
+      color: '#374151',
+      lineHeight: 21,
     },
 
     surveyCloseBtn: {

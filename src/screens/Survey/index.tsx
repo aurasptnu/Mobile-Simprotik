@@ -99,6 +99,8 @@ export default function SurveyScreen() {
     }
 
     try {
+      let backendSurvey: any = null;
+
       if (task) {
         const staffUUID = await getStaffUUID();
         
@@ -118,7 +120,8 @@ export default function SurveyScreen() {
           jawaban6: comment || '',
         };
 
-        await submitTaskSurvey(task, payload);
+        const response = await submitTaskSurvey(task, payload);
+        backendSurvey = response?.data || response || null;
         await AsyncStorage.setItem(`task_survey_${task.kind}_${task.rawId || task.id}`, 'true');
       }
 
@@ -129,12 +132,13 @@ export default function SurveyScreen() {
         answers,
         comment,
         submittedAt: new Date().toISOString(),
+        backend: backendSurvey,
       } as any;
 
       await addSurveyResponse(newSurvey);
 
       if (typeof onSurveyComplete === 'function') {
-        onSurveyComplete();
+        onSurveyComplete(newSurvey);
       }
 
       setAnswers({});

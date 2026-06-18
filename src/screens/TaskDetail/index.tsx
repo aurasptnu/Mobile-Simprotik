@@ -27,6 +27,7 @@ import {
   getMobileTaskDetail,
   uploadFinalDocumentation,
 } from '../../services/mobile';
+import {surveyQuestions} from '../../data/surveyQuestions';
 
 const arrowIcon = require('../../assets/images/panah.png');
 
@@ -53,6 +54,7 @@ export default function TaskDetailScreen() {
   const [dokumenId, setDokumenId] = useState<any>(task?.documentId || null);
   const [photo, setPhoto] = useState<string | null>(null);
   const [surveyCompleted, setSurveyCompleted] = useState(Boolean(task?.surveyCompleted));
+  const [surveyResult, setSurveyResult] = useState<any>(task?.surveyAnswers || null);
   const [showPhotoModal, setShowPhotoModal] = useState(false);
   const [showSurveyModal, setShowSurveyModal] = useState(false);
   const [loadingDetail, setLoadingDetail] = useState(true);
@@ -77,12 +79,14 @@ export default function TaskDetailScreen() {
       setDokumenId(remoteDetail.documentId || null);
       setDokumenUrl(remoteDetail.documentUrl || null);
       setSurveyCompleted(remoteDetail.surveyCompleted);
+      setSurveyResult(remoteDetail.surveyAnswers || null);
     } catch (error) {
       console.log('loadDetail error, falling back to local storage', error);
     } finally {
       try {
         const savedDoc = await AsyncStorage.getItem(`task_doc_${storageKey}`);
         const savedSurvey = await AsyncStorage.getItem(`task_survey_${storageKey}`);
+        const savedSurveyDetail = await AsyncStorage.getItem(`task_survey_detail_${storageKey}`);
 
         if (savedDoc) {
           setPhoto(savedDoc);
@@ -91,6 +95,10 @@ export default function TaskDetailScreen() {
 
         if (savedSurvey === 'true') {
           setSurveyCompleted(true);
+        }
+
+        if (savedSurveyDetail) {
+          setSurveyResult(JSON.parse(savedSurveyDetail));
         }
       } catch (error) {
         console.log('fallback load error', error);
@@ -172,9 +180,13 @@ export default function TaskDetailScreen() {
     }
   };
 
-  const saveSurveyStatus = async (status: boolean) => {
+  const saveSurveyStatus = async (status: boolean, result?: any) => {
     try {
       await AsyncStorage.setItem(`task_survey_${storageKey}`, String(status));
+      if (result) {
+        await AsyncStorage.setItem(`task_survey_detail_${storageKey}`, JSON.stringify(result));
+        setSurveyResult(result);
+      }
       setSurveyCompleted(status);
     } catch (error) {
       console.log('Error saving survey:', error);
@@ -197,11 +209,20 @@ export default function TaskDetailScreen() {
 
     navigation.navigate('Survey', {
       task: detail || task,
-      onSurveyComplete: () => saveSurveyStatus(true),
+      onSurveyComplete: (result: any) => saveSurveyStatus(true, result),
     });
   };
 
   const visibleTask = detail || task;
+  const visibleSurvey = surveyResult?.backend || surveyResult || visibleTask.surveyAnswers || null;
+  const surveyAnswers = visibleSurvey?.answers || {};
+  const surveyRows = surveyQuestions.slice(0, 5).map((question, index) => ({
+    question: question.text,
+    value: visibleSurvey?.[`jawaban${index + 1}`] ?? surveyAnswers[question.id] ?? '-',
+  }));
+  const surveyComment = visibleSurvey?.jawaban6 ?? visibleSurvey?.comment ?? '';
+  const surveyName = visibleSurvey?.nama_klien ?? visibleSurvey?.nama ?? '-';
+  const surveyNip = visibleSurvey?.nip_klien ?? visibleSurvey?.nip ?? '-';
   const documentUri = photo || dokumenUrl || (dokumenId ? getDocumentFileUrl(dokumenId) : '');
   const canFillSurvey = surveyCompleted || dokumenExists || Boolean(photo);
   const canUploadDocument = visibleTask.status === 'Sedang Berlangsung' && !dokumenExists && !photo;
@@ -333,7 +354,32 @@ export default function TaskDetailScreen() {
             </TouchableOpacity>
 
             <Text style={styles.surveyTitle}>Survei Klien</Text>
-            <Text style={styles.surveyStatus}>Survei sudah diselesaikan</Text>
+            {visibleSurvey ? (
+              <ScrollView style={styles.surveyResultScroll} showsVerticalScrollIndicator={false}>
+                <View style={styles.surveyMetaBox}>
+                  <Text style={styles.surveyMetaLabel}>Nama Klien</Text>
+                  <Text style={styles.surveyMetaValue}>{surveyName}</Text>
+                  <Text style={styles.surveyMetaLabel}>NIP Klien</Text>
+                  <Text style={styles.surveyMetaValue}>{surveyNip}</Text>
+                </View>
+
+                {surveyRows.map((row, index) => (
+                  <View key={row.question} style={styles.surveyAnswerRow}>
+                    <Text style={styles.surveyQuestionText}>{index + 1}. {row.question}</Text>
+                    <Text style={styles.surveyAnswerValue}>{row.value}</Text>
+                  </View>
+                ))}
+
+                <View style={styles.surveyCommentBox}>
+                  <Text style={styles.surveyMetaLabel}>Kritik dan Saran</Text>
+                  <Text style={styles.surveyCommentText}>{surveyComment || '-'}</Text>
+                </View>
+              </ScrollView>
+            ) : (
+              <Text style={styles.surveyStatus}>
+                Survei sudah diselesaikan, tetapi detail jawaban belum tersedia di perangkat ini.
+              </Text>
+            )}
 
             <TouchableOpacity style={styles.surveyCloseBtn} onPress={() => setShowSurveyModal(false)}>
               <Text style={styles.surveyCloseBtnText}>Tutup</Text>
