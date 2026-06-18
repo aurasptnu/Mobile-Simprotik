@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 
 import {
+  Alert,
   View,
   Text,
   Image,
@@ -28,6 +29,18 @@ import {
 } from '../../services/mobile';
 
 const arrowIcon = require('../../assets/images/panah.png');
+
+const getApiErrorMessage = (error: any, fallback: string) => {
+  const data = error?.response?.data;
+  const errors = data?.errors;
+  const firstError = errors ? Object.values(errors)?.[0] : null;
+
+  if (Array.isArray(firstError) && firstError[0]) {
+    return String(firstError[0]);
+  }
+
+  return data?.message || error?.message || fallback;
+};
 
 export default function TaskDetailScreen() {
   const route = useRoute<any>();
@@ -104,10 +117,18 @@ export default function TaskDetailScreen() {
     }
 
     if ((detail || task).status !== 'Sedang Berlangsung') {
+      Alert.alert(
+        'Belum Bisa Upload',
+        'Dokumentasi akhir hanya bisa diupload saat tugas berstatus Sedang Berlangsung.',
+      );
       return;
     }
 
-    const result = await launchImageLibrary({mediaType: 'photo', quality: 0.8});
+    const result = await launchImageLibrary({
+      mediaType: 'photo',
+      quality: 0.8,
+      selectionLimit: 1,
+    });
 
     const asset = result.assets?.[0];
     const uri = asset?.uri;
@@ -141,10 +162,11 @@ export default function TaskDetailScreen() {
       setPhoto(uri);
       await AsyncStorage.setItem(`task_doc_${storageKey}`, uri);
     } catch (error) {
-      console.log('upload failed, saving locally', error);
-      setDokumenExists(true);
-      setPhoto(uri);
-      await AsyncStorage.setItem(`task_doc_${storageKey}`, uri);
+      console.log('upload failed', error);
+      Alert.alert(
+        'Upload Gagal',
+        getApiErrorMessage(error, 'Dokumentasi akhir belum berhasil diupload ke backend.'),
+      );
     } finally {
       setUploading(false);
     }
@@ -166,6 +188,10 @@ export default function TaskDetailScreen() {
     }
 
     if (!dokumenExists && !photo) {
+      Alert.alert(
+        'Belum Bisa Isi Survei',
+        'Upload dokumentasi akhir dulu. Setelah berhasil, tombol survei bisa dipakai.',
+      );
       return;
     }
 
@@ -179,6 +205,7 @@ export default function TaskDetailScreen() {
   const documentUri = photo || dokumenUrl || (dokumenId ? getDocumentFileUrl(dokumenId) : '');
   const canFillSurvey = surveyCompleted || dokumenExists || Boolean(photo);
   const canUploadDocument = visibleTask.status === 'Sedang Berlangsung' && !dokumenExists && !photo;
+  const uploadButtonDisabled = uploading;
 
   if (loadingDetail) {
     return (
@@ -251,7 +278,7 @@ export default function TaskDetailScreen() {
         <TouchableOpacity
           style={[styles.actionButton, !canUploadDocument && !dokumenExists && !photo && {backgroundColor: '#9CA3AF'}]}
           onPress={handleUpload}
-          disabled={uploading || (!canUploadDocument && !dokumenExists && !photo)}>
+          disabled={uploadButtonDisabled}>
           {uploading ? (
             <ActivityIndicator color="#fff" />
           ) : (
@@ -273,8 +300,7 @@ export default function TaskDetailScreen() {
         </Text>
         <TouchableOpacity
           style={[styles.actionButton, !canFillSurvey && {backgroundColor: '#9CA3AF'}]}
-          onPress={handleSurvey}
-          disabled={!canFillSurvey}>
+          onPress={handleSurvey}>
           <Text style={styles.actionButtonText}>
             {surveyCompleted ? 'Lihat Survei' : 'Isi Survei'}
           </Text>

@@ -29,6 +29,18 @@ import {
 
 const arrowIcon = require('../../assets/images/panah.png');
 
+const getApiErrorMessage = (error: any, fallback: string) => {
+  const data = error?.response?.data;
+  const errors = data?.errors;
+  const firstError = errors ? Object.values(errors)?.[0] : null;
+
+  if (Array.isArray(firstError) && firstError[0]) {
+    return String(firstError[0]);
+  }
+
+  return data?.message || error?.message || fallback;
+};
+
 export default function SurveyScreen() {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
@@ -86,61 +98,64 @@ export default function SurveyScreen() {
       return;
     }
 
-    const newSurvey = {
-      id: Date.now(),
-      nama,
-      nip,
-      answers,
-      comment,
-      submittedAt: new Date().toISOString(),
-    } as any;
-    // save locally as before
-    await addSurveyResponse(newSurvey);
-
-    // if invoked from TaskDetail with taskId, try submit to backend
-    if (task) {
-      try {
+    try {
+      if (task) {
         const staffUUID = await getStaffUUID();
         
         if (!staffUUID) {
-          console.log('No staff UUID found for survey submission');
-        } else {
-          const payload = {
-            id_pengguna: staffUUID,
-            nama_klien: nama,
-            nip_klien: nip,
-            jawaban1: Number(answers[choiceQuestions[0].id]),
-            jawaban2: Number(answers[choiceQuestions[1].id]),
-            jawaban3: Number(answers[choiceQuestions[2].id]),
-            jawaban4: Number(answers[choiceQuestions[3].id]),
-            jawaban5: Number(answers[choiceQuestions[4].id]),
-            jawaban6: comment || '',
-          };
-
-          await submitTaskSurvey(task, payload);
-
-          await AsyncStorage.setItem(`task_survey_${task.kind}_${task.rawId || task.id}`, 'true');
+          throw new Error('Akun staf demo belum dipilih.');
         }
-      } catch (err) {
-        console.log('submitSurvey backend error', err);
+
+        const payload = {
+          id_pengguna: staffUUID,
+          nama_klien: nama,
+          nip_klien: nip,
+          jawaban1: Number(answers[choiceQuestions[0].id]),
+          jawaban2: Number(answers[choiceQuestions[1].id]),
+          jawaban3: Number(answers[choiceQuestions[2].id]),
+          jawaban4: Number(answers[choiceQuestions[3].id]),
+          jawaban5: Number(answers[choiceQuestions[4].id]),
+          jawaban6: comment || '',
+        };
+
+        await submitTaskSurvey(task, payload);
+        await AsyncStorage.setItem(`task_survey_${task.kind}_${task.rawId || task.id}`, 'true');
       }
-    }
 
-    if (typeof onSurveyComplete === 'function') {
-      onSurveyComplete();
-    }
+      const newSurvey = {
+        id: Date.now(),
+        nama,
+        nip,
+        answers,
+        comment,
+        submittedAt: new Date().toISOString(),
+      } as any;
 
-    setAnswers({});
-    setComment('');
-    setNama('');
-    setNip('');
-    setSubmitting(false);
-    Alert.alert('Berhasil', 'Survey berhasil disubmit', [
-      {
-        text: 'OK',
-        onPress: () => navigation.goBack(),
-      },
-    ]);
+      await addSurveyResponse(newSurvey);
+
+      if (typeof onSurveyComplete === 'function') {
+        onSurveyComplete();
+      }
+
+      setAnswers({});
+      setComment('');
+      setNama('');
+      setNip('');
+      setSubmitting(false);
+      Alert.alert('Berhasil', 'Survey berhasil disubmit', [
+        {
+          text: 'OK',
+          onPress: () => navigation.goBack(),
+        },
+      ]);
+    } catch (err) {
+      console.log('submitSurvey backend error', err);
+      setSubmitting(false);
+      Alert.alert(
+        'Survey Gagal',
+        getApiErrorMessage(err, 'Survey belum berhasil dikirim ke backend.'),
+      );
+    }
   };
 
   const renderOption = (questionId: string, value: string, selected: string, onSelect: (v:string)=>void) => (
