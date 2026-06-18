@@ -1,0 +1,82 @@
+export const colors = {
+  background: '#FFFFFF',
+  surfaceAlt: '#F7F9FC',
+  surface2: '#EEF1F8',
+  text: '#0B1E4B',
+  textSoft: '#4A5568',
+  textMuted: '#8A95A3',
+  navy50: '#E8EDF8',
+  navy100: '#C9D4EF',
+  navy200: '#9BADD6',
+  navy500: '#2950A8',
+  navy600: '#1E3E8A',
+  navy700: '#0B1E4B',
+  navy800: '#0F2150',
+  gold: '#C6A84B',
+  goldLight: '#F5EBD0',
+  goldDark: '#9E7F2A',
+  success: '#16A34A',
+  successDark: '#1F8A4C',
+  danger: '#DC2626',
+  dangerDark: '#C73434',
+  orange: '#D97706',
+  orangeDark: '#C05A14',
+  yellow: '#D4A017',
+  purple: '#7C3AED',
+  purpleDark: '#6B35C7',
+  teal: '#0B7A72',
+  cyan: '#0891B2',
+  primaryBlue: '#2563EB',
+  info: '#0EA5E9',
+  border: '#DDE3EF',
+  borderSoft: '#E8ECF4',
+  borderStrong: '#B0BCCE',
+  white: '#FFFFFF',
+};
+
+export const radius = {
+  xs: 5,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 20,
+  xxl: 24,
+  full: 9999,
+};
+
+export const font = {
+  family: 'Plus Jakarta Sans',
+  fallback: 'System',
+  size: {
+    xs: 11,
+    sm: 12,
+    base: 14,
+    md: 15,
+    lg: 16,
+    xl: 20,
+    xxl: 24,
+    display: 28,
+  },
+  lineHeight: {
+    base: 22,
+    md: 24,
+    lg: 30,
+  },
+  weight: {
+    regular: '400' as const,
+    medium: '500' as const,
+    semibold: '600' as const,
+    bold: '700' as const,
+    extrabold: '800' as const,
+  },
+};
+
+export const shadow = {
+  card: {
+    shadowColor: colors.navy700,
+    shadowOffset: {width: 0, height: 6},
+    shadowOpacity: 0.06,
+    shadowRadius: 14,
+    elevation: 3,
+  },
+};

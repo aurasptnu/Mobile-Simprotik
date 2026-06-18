@@ -21,6 +21,7 @@ import {launchImageLibrary} from 'react-native-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {styles} from './styles';
+import {colors} from '../../theme';
 import {getStaffUUID} from '../../storage/auth';
 import {
   getDocumentFileUrl,
@@ -231,7 +232,7 @@ export default function TaskDetailScreen() {
   if (loadingDetail) {
     return (
       <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-        <ActivityIndicator size="large" color="#2563EB" />
+        <ActivityIndicator size="large" color={colors.primaryBlue} />
       </View>
     );
   }
@@ -244,7 +245,7 @@ export default function TaskDetailScreen() {
           style={{
             width: 18,
             height: 18,
-            tintColor: '#2563EB',
+            tintColor: colors.primaryBlue,
             transform: [{scaleX: -1}],
           }}
         />
@@ -297,7 +298,7 @@ export default function TaskDetailScreen() {
             : 'Upload dokumen hanya saat Sedang Berlangsung'}
         </Text>
         <TouchableOpacity
-          style={[styles.actionButton, !canUploadDocument && !dokumenExists && !photo && {backgroundColor: '#9CA3AF'}]}
+          style={[styles.actionButton, !canUploadDocument && !dokumenExists && !photo && {backgroundColor: colors.textMuted}]}
           onPress={handleUpload}
           disabled={uploadButtonDisabled}>
           {uploading ? (
@@ -320,7 +321,7 @@ export default function TaskDetailScreen() {
             : 'Upload dokumentasi terlebih dahulu'}
         </Text>
         <TouchableOpacity
-          style={[styles.actionButton, !canFillSurvey && {backgroundColor: '#9CA3AF'}]}
+          style={[styles.actionButton, !canFillSurvey && {backgroundColor: colors.textMuted}]}
           onPress={handleSurvey}>
           <Text style={styles.actionButtonText}>
             {surveyCompleted ? 'Lihat Survei' : 'Isi Survei'}

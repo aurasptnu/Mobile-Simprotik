@@ -1,13 +1,14 @@
 import {
   StyleSheet,
 } from 'react-native';
+import {colors, font, radius, shadow} from '../../theme';
 
 export const styles =
   StyleSheet.create({
     flex: {
       flex: 1,
       backgroundColor:
-        '#F4F7FC',
+        colors.surfaceAlt,
     },
 
     container: {
@@ -31,89 +32,91 @@ export const styles =
     },
 
     appName: {
-      fontSize: 30,
+      fontSize: font.size.display,
       fontWeight:
-        'bold',
+        font.weight.extrabold,
       color:
-        '#2563EB',
+        colors.text,
     },
 
     subtitle: {
       marginTop: 6,
       textAlign: 'center',
-      color: '#666',
+      color: colors.textSoft,
       fontSize: 14,
     },
 
     card: {
       backgroundColor:
-        '#fff',
-      borderRadius: 28,
+        colors.white,
+      borderRadius: radius.xxl,
       padding: 24,
-      elevation: 5,
+      borderWidth: 1,
+      borderColor: colors.borderSoft,
+      ...shadow.card,
     },
 
     title: {
-      fontSize: 24,
+      fontSize: font.size.xxl,
       fontWeight:
-        'bold',
+        font.weight.extrabold,
       color:
-        '#111827',
+        colors.text,
     },
 
     desc: {
       marginTop: 5,
-      color: '#666',
+      color: colors.textSoft,
       marginBottom: 24,
     },
 
     label: {
       fontSize: 14,
       fontWeight:
-        '600',
+        font.weight.semibold,
       marginBottom: 8,
       marginTop: 12,
       color:
-        '#111827',
+        colors.text,
     },
 
     input: {
       borderWidth: 1,
       borderColor:
-        '#E5E7EB',
-      borderRadius: 16,
+        colors.border,
+      borderRadius: radius.md,
       paddingHorizontal: 18,
       paddingVertical: 14,
       backgroundColor:
-        '#F9FAFB',
+        colors.surfaceAlt,
     },
 
     error: {
-      color: '#EF4444',
+      color: colors.danger,
       marginTop: 10,
     },
 
     button: {
       backgroundColor:
-        '#2563EB',
+        colors.primaryBlue,
       paddingVertical: 18,
-      borderRadius: 18,
+      borderRadius: radius.lg,
       marginTop: 25,
     },
 
     buttonText: {
-      color: '#fff',
+      color: colors.white,
       textAlign:
         'center',
       fontWeight:
-        'bold',
+        font.weight.bold,
       fontSize: 16,
     },
 
     footer: {
       textAlign: 'center',
       marginTop: 30,
-      color: '#999',
+      color: colors.textMuted,
       fontSize: 12,
     },
 
@@ -123,16 +126,16 @@ export const styles =
       right: 0,
       bottom: 0,
       left: 0,
-      backgroundColor: 'rgba(17, 24, 39, 0.45)',
+      backgroundColor: 'rgba(11, 30, 75, 0.48)',
       justifyContent: 'flex-end',
       zIndex: 20,
       elevation: 20,
     },
 
     modalContent: {
-      backgroundColor: '#fff',
-      borderTopLeftRadius: 24,
-      borderTopRightRadius: 24,
+      backgroundColor: colors.white,
+      borderTopLeftRadius: radius.xxl,
+      borderTopRightRadius: radius.xxl,
       maxHeight: '82%',
       paddingHorizontal: 20,
       paddingTop: 18,
@@ -148,12 +151,12 @@ export const styles =
 
     modalTitle: {
       fontSize: 22,
-      fontWeight: 'bold',
-      color: '#111827',
+      fontWeight: font.weight.extrabold,
+      color: colors.text,
     },
 
     modalSubtitle: {
-      color: '#6B7280',
+      color: colors.textSoft,
       marginTop: 4,
     },
 
@@ -161,14 +164,14 @@ export const styles =
       width: 38,
       height: 38,
       borderRadius: 19,
-      backgroundColor: '#F3F4F6',
+      backgroundColor: colors.surface2,
       alignItems: 'center',
       justifyContent: 'center',
     },
 
     modalCloseText: {
-      color: '#111827',
-      fontWeight: 'bold',
+      color: colors.text,
+      fontWeight: font.weight.bold,
       fontSize: 16,
     },
 
@@ -179,10 +182,10 @@ export const styles =
     staffItem: {
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: '#F9FAFB',
+      backgroundColor: colors.surfaceAlt,
       borderWidth: 1,
-      borderColor: '#E5E7EB',
-      borderRadius: 16,
+      borderColor: colors.border,
+      borderRadius: radius.lg,
       padding: 14,
       marginBottom: 10,
     },
@@ -191,15 +194,15 @@ export const styles =
       width: 42,
       height: 42,
       borderRadius: 21,
-      backgroundColor: '#DBEAFE',
+      backgroundColor: colors.gold,
       alignItems: 'center',
       justifyContent: 'center',
       marginRight: 12,
     },
 
     staffAvatarText: {
-      color: '#2563EB',
-      fontWeight: 'bold',
+      color: colors.text,
+      fontWeight: font.weight.bold,
       fontSize: 18,
     },
 
@@ -209,20 +212,20 @@ export const styles =
     },
 
     staffName: {
-      color: '#111827',
-      fontWeight: '700',
+      color: colors.text,
+      fontWeight: font.weight.bold,
       fontSize: 15,
       marginBottom: 4,
     },
 
     staffMeta: {
-      color: '#6B7280',
+      color: colors.textSoft,
       fontSize: 12,
       lineHeight: 17,
     },
 
     staffNip: {
-      color: '#9CA3AF',
+      color: colors.textMuted,
       fontSize: 12,
       marginTop: 4,
     },
@@ -234,20 +237,20 @@ export const styles =
     },
 
     loadingText: {
-      color: '#6B7280',
+      color: colors.textSoft,
       marginTop: 12,
     },
 
     emptyText: {
-      color: '#6B7280',
+      color: colors.textSoft,
       textAlign: 'center',
       paddingVertical: 32,
     },
 
     modalError: {
-      color: '#DC2626',
+      color: colors.danger,
       backgroundColor: '#FEF2F2',
-      borderRadius: 12,
+      borderRadius: radius.md,
       paddingHorizontal: 12,
       paddingVertical: 10,
       marginBottom: 12,

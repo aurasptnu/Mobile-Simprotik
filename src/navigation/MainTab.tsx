@@ -12,6 +12,7 @@ import {
 import HomeScreen from '../screens/Home';
 import TasksScreen from '../screens/Tasks';
 import ProfileScreen from '../screens/Profile';
+import {colors, font, radius} from '../theme';
 
 const homeIcon = require('../assets/images/home.png');
 const taskIcon = require('../assets/images/task.png');
@@ -41,19 +42,19 @@ export default function MainTab() {
 
           right: 20,
 
-          borderRadius: 30,
+          borderRadius: radius.xxl,
 
           height: 75,
 
           paddingTop: 10,
 
           backgroundColor:
-            '#fff',
+            colors.white,
 
           elevation: 12,
 
           shadowColor:
-            '#000',
+            colors.navy700,
 
           shadowOpacity:
             0.1,
@@ -69,15 +70,15 @@ export default function MainTab() {
         },
 
         tabBarActiveTintColor:
-          '#2563EB',
+          colors.primaryBlue,
 
         tabBarInactiveTintColor:
-          '#9CA3AF',
+          colors.textMuted,
 
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight:
-            '600',
+            font.weight.semibold,
           marginBottom: 6,
         },
 

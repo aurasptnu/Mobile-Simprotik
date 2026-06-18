@@ -18,6 +18,7 @@ import {
 import {saveStaffUUID, saveUser} from '../../storage/auth';
 
 import {styles} from './styles';
+import {colors} from '../../theme';
 
 const getInitials = (name: string) =>
   name
@@ -115,7 +116,7 @@ export default function LoginScreen() {
 
         {loading ? (
           <View style={styles.loadingBox}>
-            <ActivityIndicator size="large" color="#2563EB" />
+            <ActivityIndicator size="large" color={colors.primaryBlue} />
             <Text style={styles.loadingText}>Mengambil data staf...</Text>
           </View>
         ) : (
@@ -141,7 +142,7 @@ export default function LoginScreen() {
                 </View>
 
                 {selectingUuid === staff.uuid && (
-                  <ActivityIndicator color="#2563EB" />
+                  <ActivityIndicator color={colors.primaryBlue} />
                 )}
               </TouchableOpacity>
             ))}

@@ -21,6 +21,7 @@ import { getStaffUUID } from '../../storage/auth';
 import { addSurveyResponse } from '../../data/survey';
 import { surveyQuestions } from '../../data/surveyQuestions';
 import { styles } from './styles';
+import {colors} from '../../theme';
 import {
   getSurveyQuestions,
   MobileSurveyQuestion,
@@ -179,7 +180,7 @@ export default function SurveyScreen() {
           style={{
             width: 18,
             height: 18,
-            tintColor: '#2563EB',
+            tintColor: colors.primaryBlue,
             transform: [{ scaleX: -1 }],
           }}
         />
@@ -219,7 +220,7 @@ export default function SurveyScreen() {
 
       {loadingQuestions && (
         <View style={styles.card}>
-          <ActivityIndicator color="#2563EB" />
+          <ActivityIndicator color={colors.primaryBlue} />
         </View>
       )}
 
@@ -246,7 +247,7 @@ export default function SurveyScreen() {
 
       <TouchableOpacity style={styles.button} onPress={submitSurvey} disabled={submitting}>
         {submitting ? (
-          <ActivityIndicator color="#fff" />
+          <ActivityIndicator color={colors.white} />
         ) : (
           <Text style={styles.buttonText}>Submit Survey</Text>
         )}

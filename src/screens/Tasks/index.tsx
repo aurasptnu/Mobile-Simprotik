@@ -32,6 +32,7 @@ import {
 } from '../../data/tasks';
 
 import { styles } from './styles';
+import {colors} from '../../theme';
 
 const arrowIcon = require('../../assets/images/panah.png');
 export default function TasksScreen() {
@@ -300,7 +301,7 @@ export default function TasksScreen() {
             style={{
               width: 18,
               height: 18,
-              tintColor: '#9CA3AF',
+              tintColor: colors.textMuted,
               resizeMode: 'contain',
             }}
           />
@@ -394,7 +395,7 @@ export default function TasksScreen() {
               styles.searchInput
             }
             placeholder="Cari tugas"
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor={colors.textMuted}
             value={searchQuery}
             onChangeText={text =>
               setSearchQuery(text)
@@ -477,7 +478,7 @@ export default function TasksScreen() {
         >
           <Text
             style={{
-              color: '#6B7280',
+              color: colors.textSoft,
               fontSize: 16,
             }}
           >

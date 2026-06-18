@@ -1,13 +1,14 @@
 import {
   StyleSheet,
 } from 'react-native';
+import {colors, font, radius, shadow} from '../../theme';
 
 export const styles =
   StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor:
-        '#F4F7FC',
+        colors.surfaceAlt,
       alignItems:
         'center',
       padding: 24,
@@ -16,8 +17,8 @@ export const styles =
     avatar: {
       width: 110,
       height: 110,
-      borderRadius: 60,
-      backgroundColor: '#2563EB',
+      borderRadius: radius.full,
+      backgroundColor: colors.gold,
       justifyContent: 'center',
       alignItems: 'center',
       marginTop: 0,
@@ -26,33 +27,33 @@ export const styles =
     avatarText: {
       fontSize: 40,
       fontWeight:
-        'bold',
-      color: '#fff',
+        font.weight.extrabold,
+      color: colors.text,
     },
 
     name: {
       fontSize: 24,
-      fontWeight: 'bold',
+      fontWeight: font.weight.extrabold,
       marginTop: 20,
-      color: '#111827',
+      color: colors.text,
     },
 
     email: {
       fontSize: 15,
-      color: '#4B5563',
+      color: colors.textSoft,
       marginTop: 8,
       textAlign: 'center',
     },
 
     sectionTitle: {
       fontSize: 16,
-      fontWeight: 'bold',
-      color: '#111827',
+      fontWeight: font.weight.bold,
+      color: colors.text,
       marginBottom: 18,
     },
 
     role: {
-      color: '#666',
+      color: colors.textSoft,
       marginTop: 5,
       marginBottom: 30,
       textAlign: 'center',
@@ -61,22 +62,20 @@ export const styles =
     screenTitle: {
       width: '100%',
       fontSize: 28,
-      fontWeight: 'bold',
-      color: '#111827',
+      fontWeight: font.weight.extrabold,
+      color: colors.text,
       marginBottom: 16,
     },
 
     profileCard: {
       width: '100%',
-      backgroundColor: '#fff',
-      borderRadius: 24,
+      backgroundColor: colors.white,
+      borderRadius: radius.xl,
       padding: 24,
       alignItems: 'center',
-      shadowColor: '#000',
-      shadowOpacity: 0.05,
-      shadowRadius: 10,
-      shadowOffset: { width: 0, height: 6 },
-      elevation: 4,
+      borderWidth: 1,
+      borderColor: colors.borderSoft,
+      ...shadow.card,
       marginBottom: 20,
     },
 
@@ -85,25 +84,23 @@ export const styles =
       backgroundColor: '#DCFCE7',
       paddingHorizontal: 12,
       paddingVertical: 6,
-      borderRadius: 999,
+      borderRadius: radius.full,
     },
 
     statusText: {
-      color: '#166534',
+      color: colors.successDark,
       fontSize: 12,
-      fontWeight: '700',
+      fontWeight: font.weight.bold,
     },
 
     detailCard: {
       width: '100%',
-      backgroundColor: '#fff',
-      borderRadius: 24,
+      backgroundColor: colors.white,
+      borderRadius: radius.xl,
       padding: 20,
-      shadowColor: '#000',
-      shadowOpacity: 0.05,
-      shadowRadius: 10,
-      shadowOffset: { width: 0, height: 6 },
-      elevation: 4,
+      borderWidth: 1,
+      borderColor: colors.borderSoft,
+      ...shadow.card,
       marginBottom: 20,
     },
 
@@ -113,17 +110,17 @@ export const styles =
       alignItems: 'center',
       paddingVertical: 16,
       borderBottomWidth: 1,
-      borderBottomColor: '#EEF2FF',
+      borderBottomColor: colors.borderSoft,
     },
 
     detailLabel: {
-      color: '#6B7280',
+      color: colors.textSoft,
       fontSize: 14,
     },
 
     detailValue: {
-      color: '#111827',
-      fontWeight: '600',
+      color: colors.text,
+      fontWeight: font.weight.semibold,
       fontSize: 14,
       maxWidth: '60%',
       textAlign: 'right',
@@ -134,31 +131,31 @@ export const styles =
     },
 
     label: {
-      color: '#666',
+      color: colors.textSoft,
       marginBottom: 5,
       fontSize: 14,
     },
 
     value: {
-      fontWeight: 'bold',
+      fontWeight: font.weight.bold,
       fontSize: 16,
-      color: '#111827',
+      color: colors.text,
     },
 
     logoutButton: {
-      backgroundColor: '#fff',
+      backgroundColor: colors.white,
       width: '100%',
       padding: 18,
-      borderRadius: 20,
+      borderRadius: radius.lg,
       marginTop: 30,
       borderWidth: 1,
       borderColor: '#FCA5A5',
     },
 
     logoutText: {
-      color: '#DC2626',
+      color: colors.danger,
       textAlign: 'center',
-      fontWeight: 'bold',
+      fontWeight: font.weight.bold,
       fontSize: 16,
     },
   });

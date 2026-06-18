@@ -1,13 +1,14 @@
 import {
   StyleSheet,
 } from 'react-native';
+import {colors, font, radius, shadow} from '../../theme';
 
 export const styles =
   StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor:
-        '#F6F7FB',
+        colors.surfaceAlt,
       paddingHorizontal: 20,
       paddingTop: 20,
       paddingBottom: 140,
@@ -25,14 +26,15 @@ export const styles =
 
     welcome: {
       fontSize: 13,
-      color: '#9CA3AF',
+      color: colors.textMuted,
+      fontWeight: font.weight.medium,
     },
 
     name: {
-      fontSize: 30,
+      fontSize: font.size.display,
       fontWeight:
-        '700',
-      color: '#111827',
+        font.weight.extrabold,
+      color: colors.text,
       marginTop: 4,
     },
 
@@ -41,7 +43,7 @@ export const styles =
       height: 48,
       borderRadius: 24,
       backgroundColor:
-        '#fff',
+        colors.white,
       justifyContent:
         'center',
       alignItems:
@@ -77,74 +79,52 @@ export const styles =
       width: '48%',
       marginBottom: 12,
       backgroundColor:
-        '#fff',
+        colors.white,
 
-      borderRadius: 22,
-      padding: 10,
+      borderRadius: radius.lg,
+      padding: 14,
+      borderWidth: 1,
+      borderColor: colors.borderSoft,
 
-      shadowColor:
-        '#000',
-
-      shadowOffset: {
-        width: 0,
-        height: 4,
-      },
-
-      shadowOpacity:
-        0.06,
-
-      shadowRadius: 10,
-
-      elevation: 2,
+      ...shadow.card,
     },
 
     statTitle: {
-      fontSize: 9,
-      color: '#9CA3AF',
+      fontSize: font.size.xs,
+      color: colors.textSoft,
       fontWeight:
-        '600',
+        font.weight.bold,
       marginBottom: 6,
     },
 
     statNumber: {
-      fontSize: 20,
+      fontSize: font.size.xxl,
       fontWeight:
-        '700',
-      color: '#111827',
+        font.weight.extrabold,
+      color: colors.text,
     },
 
     sectionTitle: {
       fontSize: 12,
       fontWeight:
-        '700',
-      color: '#9CA3AF',
+        font.weight.bold,
+      color: colors.textMuted,
       marginBottom: 12,
       letterSpacing: 1,
     },
 
     progressCard: {
       backgroundColor:
-        '#fff',
+        colors.white,
 
-      borderRadius: 24,
+      borderRadius: radius.xl,
       padding: 20,
+      borderWidth: 1,
+      borderColor: colors.borderSoft,
 
       marginBottom: 25,
 
-      shadowColor:
-        '#000',
-
-      shadowOffset: {
-        width: 0,
-        height: 4,
-      },
-
-      shadowOpacity:
-        0.06,
-
-      shadowRadius: 10,
-
-      elevation: 2,
+      ...shadow.card,
     },
 
     rowBetween: {
@@ -161,22 +141,22 @@ export const styles =
     progressTitle: {
       fontSize: 18,
       fontWeight:
-        '600',
-      color: '#111827',
+        font.weight.semibold,
+      color: colors.text,
     },
 
     progressPercent: {
       fontSize: 20,
       fontWeight:
-        '700',
-      color: '#2563EB',
+        font.weight.bold,
+      color: colors.primaryBlue,
     },
 
     progressBg: {
       width: '100%',
       height: 8,
       backgroundColor:
-        '#E5E7EB',
+        colors.surface2,
       borderRadius: 999,
       marginTop: 18,
     },
@@ -184,32 +164,32 @@ export const styles =
     progressFill: {
       height: 8,
       backgroundColor:
-        '#2563EB',
+        colors.primaryBlue,
       borderRadius: 999,
     },
 
     progressText: {
       marginTop: 14,
-      color: '#9CA3AF',
+      color: colors.textMuted,
       fontSize: 13,
     },
 
     progressText2: {
       fontSize: 16,
       fontWeight:
-        '600',
-      color: '#111827',
+        font.weight.semibold,
+      color: colors.text,
     },
 
     link: {
-      color: '#2563EB',
+      color: colors.info,
       fontWeight:
-        '600',
+        font.weight.semibold,
       fontSize: 13,
     },
 
     notificationCard: {
-      borderRadius: 22,
+      borderRadius: radius.lg,
       padding: 18,
       marginBottom: 12,
     },
@@ -217,51 +197,40 @@ export const styles =
     notificationTitle: {
       fontSize: 16,
       fontWeight:
-        '700',
-      color: '#111827',
+        font.weight.bold,
+      color: colors.text,
       marginBottom: 5,
     },
 
     notificationDesc: {
       fontSize: 13,
-      color: '#6B7280',
+      color: colors.textSoft,
       lineHeight: 18,
     },
 
     taskCard: {
       backgroundColor:
-        '#fff',
+        colors.white,
 
-      borderRadius: 20,
+      borderRadius: radius.lg,
       padding: 18,
       marginBottom: 12,
+      borderWidth: 1,
+      borderColor: colors.borderSoft,
 
-      shadowColor:
-        '#000',
-
-      shadowOffset: {
-        width: 0,
-        height: 4,
-      },
-
-      shadowOpacity:
-        0.05,
-
-      shadowRadius: 10,
-
-      elevation: 2,
+      ...shadow.card,
     },
 
     taskTitle: {
       fontSize: 15,
       fontWeight:
-        '700',
-      color: '#111827',
+        font.weight.bold,
+      color: colors.text,
       marginBottom: 6,
     },
 
     taskDesc: {
-      color: '#9CA3AF',
+      color: colors.textMuted,
       fontSize: 13,
     },
 
@@ -270,7 +239,7 @@ export const styles =
     },
 
     taskInfo: {
-      color: '#6B7280',
+      color: colors.textSoft,
       fontSize: 13,
       fontWeight:
         '500',
@@ -286,14 +255,14 @@ export const styles =
     },
 
     taskStatus: {
-      color: '#2563EB',
+      color: colors.primaryBlue,
       fontSize: 12,
       fontWeight:
         '600',
     },
 
     taskDeadline: {
-      color: '#9CA3AF',
+      color: colors.textMuted,
       fontSize: 12,
     },
   });

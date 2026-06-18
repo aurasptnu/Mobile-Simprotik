@@ -26,6 +26,7 @@ import {
 import { getDashboard } from '../../services/mobile';
 
 import { styles } from './styles';
+import {colors} from '../../theme';
 
 export default function HomeScreen() {
   const navigation =
@@ -191,7 +192,7 @@ export default function HomeScreen() {
         <View
           style={[
             styles.statCard,
-            { backgroundColor: '#D1FAE5' },
+            { backgroundColor: colors.goldLight },
           ]}
         >
           <Text
@@ -217,7 +218,7 @@ export default function HomeScreen() {
         <View
           style={[
             styles.statCard,
-            { backgroundColor: '#DBEAFE' },
+            { backgroundColor: colors.navy50 },
           ]}
         >
           <Text
@@ -243,7 +244,7 @@ export default function HomeScreen() {
         <View
           style={[
             styles.statCard,
-            { backgroundColor: '#FED7AA' },
+            { backgroundColor: '#FFF7ED' },
           ]}
         >
           <Text
@@ -269,7 +270,7 @@ export default function HomeScreen() {
         <View
           style={[
             styles.statCard,
-            { backgroundColor: '#CFFAFE' },
+            { backgroundColor: '#ECFDF5' },
           ]}
         >
           <Text

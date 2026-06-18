@@ -1,135 +1,130 @@
-import {
-  StyleSheet,
-} from 'react-native';
+import {StyleSheet} from 'react-native';
+import {colors, font, radius, shadow} from '../../theme';
 
-export const styles =
-  StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor:
-        '#F4F7FC',
-      padding: 20,
-    },
+export const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.surfaceAlt,
+    padding: 20,
+  },
 
-    header: {
-      fontSize: 24,
-      fontWeight:
-        'bold',
-      marginBottom: 20,
-      color:
-        '#111827',
-    },
+  header: {
+    fontSize: font.size.xxl,
+    fontWeight: font.weight.extrabold,
+    marginBottom: 20,
+    color: colors.text,
+  },
 
-    card: {
-      backgroundColor:
-        '#fff',
-      borderRadius: 22,
-      padding: 20,
-      marginBottom: 15,
-    },
+  card: {
+    backgroundColor: colors.white,
+    borderRadius: radius.xl,
+    padding: 20,
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: colors.borderSoft,
+    ...shadow.card,
+  },
 
-    question: {
-      fontWeight:
-        'bold',
-      fontSize: 16,
-      marginBottom: 15,
-    },
+  question: {
+    fontWeight: font.weight.bold,
+    fontSize: font.size.lg,
+    marginBottom: 15,
+    color: colors.text,
+    lineHeight: font.lineHeight.md,
+  },
 
-    option: {
-      borderWidth: 1,
-      borderColor:
-        '#E5E7EB',
-      padding: 15,
-      borderRadius: 16,
-      marginBottom: 10,
-    },
+  option: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: 15,
+    borderRadius: radius.lg,
+    marginBottom: 10,
+    backgroundColor: colors.white,
+  },
 
-    selectedOption: {
-      backgroundColor:
-        '#2563EB',
-      borderColor:
-        '#2563EB',
-    },
+  selectedOption: {
+    backgroundColor: colors.primaryBlue,
+    borderColor: colors.primaryBlue,
+  },
 
-    optionText: {
-      color: '#333',
-    },
+  optionText: {
+    color: colors.textSoft,
+    fontWeight: font.weight.medium,
+  },
 
-    selectedText: {
-      color: '#fff',
-      fontWeight:
-        'bold',
-    },
+  selectedText: {
+    color: colors.white,
+    fontWeight: font.weight.bold,
+  },
 
-    input: {
-      borderWidth: 1,
-      borderColor:
-        '#E5E7EB',
-      borderRadius: 16,
-      padding: 16,
-      textAlignVertical:
-        'top',
-      minHeight: 120,
-    },
+  input: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.lg,
+    padding: 16,
+    textAlignVertical: 'top',
+    minHeight: 120,
+    backgroundColor: colors.surfaceAlt,
+    color: colors.text,
+  },
 
-    inputSmall: {
-      borderWidth: 1,
-      borderColor:
-        '#E5E7EB',
-      borderRadius: 12,
-      padding: 12,
-      height: 44,
-      fontSize: 14,
-    },
+  inputSmall: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.md,
+    padding: 12,
+    height: 44,
+    fontSize: font.size.base,
+    backgroundColor: colors.surfaceAlt,
+    color: colors.text,
+  },
 
-    button: {
-      backgroundColor:
-        '#2563EB',
-      padding: 18,
-      borderRadius: 20,
-      marginTop: 10,
-      marginBottom: 40,
-    },
+  button: {
+    backgroundColor: colors.primaryBlue,
+    padding: 18,
+    borderRadius: radius.xl,
+    marginTop: 10,
+    marginBottom: 40,
+  },
 
-    buttonText: {
-      color: '#fff',
-      textAlign:
-        'center',
-      fontWeight:
-        'bold',
-      fontSize: 16,
-    },
-    backButton: {
-      marginBottom: 10,
-      paddingVertical: 6,
-      paddingHorizontal: 8,
-      alignSelf: 'flex-start',
-    },
+  buttonText: {
+    color: colors.white,
+    textAlign: 'center',
+    fontWeight: font.weight.bold,
+    fontSize: font.size.lg,
+  },
 
-    backText: {
-      color: '#2563EB',
-      fontWeight: 'bold',
-    },
+  backButton: {
+    marginBottom: 10,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    alignSelf: 'flex-start',
+  },
 
-    sectionTitle: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      marginBottom: 15,
-      color: '#111827',
-    },
+  backText: {
+    color: colors.primaryBlue,
+    fontWeight: font.weight.bold,
+  },
 
-    label: {
-      fontSize: 14,
-      fontWeight: '600',
-      marginBottom: 8,
-      color: '#374151',
-      marginTop: 12,
-    },
+  sectionTitle: {
+    fontSize: font.size.lg,
+    fontWeight: font.weight.bold,
+    marginBottom: 15,
+    color: colors.text,
+  },
 
-    scaleInfo: {
-      fontSize: 14,
-      color: '#4B5563',
-      marginBottom: 6,
-      lineHeight: 20,
-    },
-  });
+  label: {
+    fontSize: font.size.base,
+    fontWeight: font.weight.semibold,
+    marginBottom: 8,
+    color: colors.textSoft,
+    marginTop: 12,
+  },
+
+  scaleInfo: {
+    fontSize: font.size.base,
+    color: colors.textSoft,
+    marginBottom: 6,
+    lineHeight: font.lineHeight.base,
+  },
+});

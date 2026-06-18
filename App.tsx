@@ -1,7 +1,20 @@
 import React, {useEffect} from 'react';
-import {NativeModules} from 'react-native';
+import {NativeModules, Text, TextInput} from 'react-native';
 import AppNavigation from './src/navigation';
 import {loadSurveysFromFile} from './src/data/survey';
+import {colors, font} from './src/theme';
+
+(Text as any).defaultProps = (Text as any).defaultProps || {};
+(Text as any).defaultProps.style = [
+  {fontFamily: font.family, color: colors.text, fontSize: 14, lineHeight: 22},
+  (Text as any).defaultProps.style,
+];
+
+(TextInput as any).defaultProps = (TextInput as any).defaultProps || {};
+(TextInput as any).defaultProps.style = [
+  {fontFamily: font.family, color: colors.text, fontSize: 14},
+  (TextInput as any).defaultProps.style,
+];
 
 export default function App() {
   useEffect(() => {

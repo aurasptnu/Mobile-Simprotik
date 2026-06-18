@@ -1,23 +1,24 @@
 import {
   StyleSheet,
 } from 'react-native';
+import {colors, font, radius, shadow} from '../../theme';
 
 export const styles =
   StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor:
-        '#F6F7FB',
+        colors.surfaceAlt,
       padding: 20,
       paddingBottom: 120,
     },
 
     header: {
-      fontSize: 28,
+      fontSize: font.size.display,
       fontWeight:
-        '700',
+        font.weight.extrabold,
       color:
-        '#111827',
+        colors.text,
       marginBottom: 20,
     },
 
@@ -35,36 +36,28 @@ export const styles =
       flexDirection: 'row',
       alignItems: 'center',
       backgroundColor:
-        '#fff',
-      borderRadius: 16,
+        colors.white,
+      borderRadius: radius.md,
       borderWidth: 1,
-      borderColor: '#E5E7EB',
+      borderColor: colors.border,
       paddingHorizontal: 12,
       paddingVertical: 8,
-      shadowColor:
-        '#000',
-      shadowOffset: {
-        width: 0,
-        height: 4,
-      },
-      shadowOpacity: 0.05,
-      shadowRadius: 10,
-      elevation: 2,
+      ...shadow.card,
     },
 
     searchInput: {
       fontSize: 14,
-      color: '#111827',
+      color: colors.text,
       flex: 1,
       minHeight: 44,
     },
 
     filterToggle: {
       backgroundColor:
-        '#2563EB',
+        colors.primaryBlue,
       paddingHorizontal: 18,
       paddingVertical: 12,
-      borderRadius: 16,
+      borderRadius: radius.md,
       justifyContent:
         'center',
       alignItems:
@@ -72,25 +65,17 @@ export const styles =
     },
 
     filterToggleText: {
-      color: '#fff',
-      fontWeight: '700',
+      color: colors.white,
+      fontWeight: font.weight.bold,
     },
 
     filterMenu: {
       backgroundColor:
-        '#fff',
-      borderRadius: 18,
+        colors.white,
+      borderRadius: radius.lg,
       paddingVertical: 8,
       marginBottom: 20,
-      shadowColor:
-        '#000',
-      shadowOffset: {
-        width: 0,
-        height: 4,
-      },
-      shadowOpacity: 0.05,
-      shadowRadius: 10,
-      elevation: 2,
+      ...shadow.card,
     },
 
     filterOption: {
@@ -100,64 +85,53 @@ export const styles =
 
     activeOption: {
       backgroundColor:
-        '#EFF6FF',
+        colors.navy50,
     },
 
     filterOptionText: {
-      color: '#111827',
+      color: colors.text,
       fontSize: 14,
     },
 
     activeOptionText: {
-      color: '#2563EB',
-      fontWeight: '700',
+      color: colors.primaryBlue,
+      fontWeight: font.weight.bold,
     },
 
     filterButton: {
       backgroundColor:
-        '#fff',
+        colors.white,
       paddingHorizontal: 18,
       paddingVertical: 12,
-      borderRadius: 14,
+      borderRadius: radius.md,
       marginRight: 10,
     },
 
     activeButton: {
       backgroundColor:
-        '#2563EB',
+        colors.primaryBlue,
     },
 
     filterText: {
-      color: '#6B7280',
+      color: colors.textSoft,
       fontWeight:
-        '600',
+        font.weight.semibold,
     },
 
     activeText: {
-      color: '#fff',
+      color: colors.white,
     },
 
     taskCard: {
       backgroundColor:
-        '#fff',
-      borderRadius: 22,
+        colors.white,
+      borderRadius: radius.lg,
       padding: 18,
       marginBottom: 15,
+      borderWidth: 1,
+      borderColor: colors.borderSoft,
 
-      shadowColor:
-        '#000',
-
-      shadowOffset: {
-        width: 0,
-        height: 4,
-      },
-
-      shadowOpacity:
-        0.05,
-
-      shadowRadius: 10,
-
-      elevation: 2,
+      ...shadow.card,
     },
 
     rowBetween: {
@@ -173,54 +147,54 @@ export const styles =
     badge: {
       paddingHorizontal: 12,
       paddingVertical: 6,
-      borderRadius: 999,
+      borderRadius: radius.full,
     },
 
     orangeBadge: {
       backgroundColor:
-        '#FDE68A',
+        colors.goldLight,
     },
 
     yellowBadge: {
       backgroundColor:
-        '#FEE2E2',
+        '#FFF7ED',
     },
 
     greenBadge: {
       backgroundColor:
-        '#BBF7D0',
+        '#DCFCE7',
     },
 
     grayBadge: {
       backgroundColor:
-        '#E5E7EB',
+        colors.surface2,
     },
 
     badgeText: {
       fontSize: 11,
       fontWeight:
-        '700',
+        font.weight.bold,
       color:
-        '#111827',
+        colors.text,
     },
 
     taskTitle: {
       fontSize: 16,
       fontWeight:
-        '700',
+        font.weight.bold,
       color:
-        '#111827',
+        colors.text,
       marginBottom: 10,
     },
 
     taskInfo: {
       fontSize: 14,
-      color: '#6B7280',
+      color: colors.textSoft,
       marginBottom: 6,
     },
 
     deadline: {
-      color: '#9CA3AF',
+      color: colors.textMuted,
       fontSize: 13,
     },
 
@@ -232,13 +206,13 @@ export const styles =
     },
 
     indicatorText: {
-      backgroundColor: '#F3F4F6',
-      color: '#4B5563',
-      borderRadius: 999,
+      backgroundColor: colors.surface2,
+      color: colors.textSoft,
+      borderRadius: radius.full,
       paddingHorizontal: 10,
       paddingVertical: 5,
       fontSize: 12,
-      fontWeight: '600',
+      fontWeight: font.weight.semibold,
     },
 
     assignedByContainer: {
@@ -259,7 +233,7 @@ export const styles =
 
     assignedByText: {
       fontSize: 13,
-      color: '#6B7280',
-      fontWeight: '500',
+      color: colors.textSoft,
+      fontWeight: font.weight.medium,
     },
   });

@@ -1,318 +1,308 @@
-import {
-  StyleSheet,
-} from 'react-native';
+import {StyleSheet} from 'react-native';
+import {colors, font, radius, shadow} from '../../theme';
 
-export const styles =
-  StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor:
-        '#F4F7FC',
-      padding: 20,
-    },
+export const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.surfaceAlt,
+    padding: 20,
+  },
 
-    headerRow: {
-      flexDirection:
-        'row',
-      justifyContent:
-        'space-between',
-      marginBottom: 20,
-    },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
 
-    statusBadge: {
-      backgroundColor:
-        '#DBEAFE',
-      paddingHorizontal: 16,
-      paddingVertical: 10,
-      borderRadius: 20,
-    },
+  statusBadge: {
+    backgroundColor: colors.navy50,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: radius.full,
+    borderWidth: 1,
+    borderColor: colors.navy100,
+  },
 
-    statusText: {
-      color:
-        '#2563EB',
-      fontWeight:
-        'bold',
-    },
+  statusText: {
+    color: colors.primaryBlue,
+    fontWeight: font.weight.bold,
+  },
 
-    priorityBadge: {
-      backgroundColor:
-        '#FEE2E2',
-      paddingHorizontal: 16,
-      paddingVertical: 10,
-      borderRadius: 20,
-    },
+  priorityBadge: {
+    backgroundColor: '#FEF2F2',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: radius.full,
+  },
 
-    priorityText: {
-      color:
-        '#DC2626',
-      fontWeight:
-        'bold',
-    },
+  priorityText: {
+    color: colors.danger,
+    fontWeight: font.weight.bold,
+  },
 
-    title: {
-      fontSize: 26,
-      fontWeight:
-        'bold',
-      marginBottom: 20,
-      color:
-        '#111827',
-    },
+  title: {
+    fontSize: font.size.xxl,
+    fontWeight: font.weight.extrabold,
+    marginBottom: 20,
+    color: colors.text,
+    lineHeight: 32,
+  },
 
-    card: {
-      backgroundColor:
-        '#fff',
-      borderRadius: 22,
-      padding: 20,
-      marginBottom: 15,
-    },
+  card: {
+    backgroundColor: colors.white,
+    borderRadius: radius.xl,
+    padding: 20,
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: colors.borderSoft,
+    ...shadow.card,
+  },
 
-    label: {
-      fontSize: 14,
-      color: '#666',
-      marginBottom: 8,
-    },
+  label: {
+    fontSize: font.size.base,
+    color: colors.textSoft,
+    marginBottom: 8,
+    fontWeight: font.weight.semibold,
+  },
 
-    description: {
-      lineHeight: 24,
-      color: '#444',
-    },
+  description: {
+    lineHeight: font.lineHeight.md,
+    color: colors.textSoft,
+  },
 
-    subText: {
-      color: '#6B7280',
-      marginBottom: 12,
-    },
+  subText: {
+    color: colors.textMuted,
+    marginBottom: 12,
+  },
 
-    image: {
-      width: '100%',
-      height: 220,
-      borderRadius: 20,
-      marginTop: 10,
-    },
+  image: {
+    width: '100%',
+    height: 220,
+    borderRadius: radius.xl,
+    marginTop: 10,
+  },
 
-    actionButton: {
-      backgroundColor: '#2563EB',
-      padding: 16,
-      borderRadius: 18,
-      alignItems: 'center',
-      marginTop: 8,
-    },
+  actionButton: {
+    backgroundColor: colors.primaryBlue,
+    padding: 16,
+    borderRadius: radius.lg,
+    alignItems: 'center',
+    marginTop: 8,
+  },
 
-    actionButtonText: {
-      color: '#fff',
-      fontWeight: 'bold',
-      fontSize: 15,
-    },
+  actionButtonText: {
+    color: colors.white,
+    fontWeight: font.weight.bold,
+    fontSize: font.size.md,
+  },
 
-    uploadButton: {
-      backgroundColor: '#2563EB',
-      padding: 18,
-      borderRadius: 20,
-      marginTop: 10,
-    },
+  uploadButton: {
+    backgroundColor: colors.primaryBlue,
+    padding: 18,
+    borderRadius: radius.xl,
+    marginTop: 10,
+  },
 
-    surveyButton: {
-      backgroundColor: '#10B981',
-      padding: 18,
-      borderRadius: 20,
-      marginTop: 15,
-      marginBottom: 40,
-    },
+  surveyButton: {
+    backgroundColor: colors.success,
+    padding: 18,
+    borderRadius: radius.xl,
+    marginTop: 15,
+    marginBottom: 40,
+  },
 
-    buttonText: {
-      color: '#fff',
-      textAlign: 'center',
-      fontWeight: 'bold',
-      fontSize: 16,
-    },
-    backButton: {
-      marginBottom: 10,
-      paddingVertical: 6,
-      paddingHorizontal: 8,
-      alignSelf: 'flex-start',
-    },
+  buttonText: {
+    color: colors.white,
+    textAlign: 'center',
+    fontWeight: font.weight.bold,
+    fontSize: font.size.lg,
+  },
 
-    backText: {
-      color: '#2563EB',
-      fontWeight: 'bold',
-    },
+  backButton: {
+    marginBottom: 10,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    alignSelf: 'flex-start',
+  },
 
-    assignedByRow: {
-      flexDirection: 'row',
-      alignItems: 'flex-start',
-      flexWrap: 'wrap',
-      width: '100%',
-    },
+  backText: {
+    color: colors.primaryBlue,
+    fontWeight: font.weight.bold,
+  },
 
-    value: {
-      fontWeight: 'bold',
-      fontSize: 16,
-      flex: 1,
-      flexShrink: 1,
-      minWidth: 0,
-    },
+  assignedByRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    flexWrap: 'wrap',
+    width: '100%',
+  },
 
-    profileIconSmall: {
-      width: 24,
-      height: 24,
-      borderRadius: 12,
-      marginRight: 10,
-      marginTop: 2,
-      resizeMode: 'contain',
-    },
+  value: {
+    fontWeight: font.weight.bold,
+    fontSize: font.size.lg,
+    color: colors.text,
+    flex: 1,
+    flexShrink: 1,
+    minWidth: 0,
+  },
 
-    modalOverlay: {
-      flex: 1,
-      backgroundColor:
-        'rgba(0, 0, 0, 0.8)',
-      justifyContent:
-        'center',
-      alignItems: 'center',
-    },
+  profileIconSmall: {
+    width: 24,
+    height: 24,
+    borderRadius: radius.full,
+    marginRight: 10,
+    marginTop: 2,
+    resizeMode: 'contain',
+  },
 
-    modalContent: {
-      width: '90%',
-      height: '80%',
-      backgroundColor:
-        '#fff',
-      borderRadius: 20,
-      padding: 20,
-      position: 'relative',
-    },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(11, 30, 75, 0.78)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 
-    closeButton: {
-      position: 'absolute',
-      top: 15,
-      right: 15,
-      zIndex: 1,
-      backgroundColor:
-        'rgba(0, 0, 0, 0.3)',
-      width: 40,
-      height: 40,
-      borderRadius: 20,
-      justifyContent:
-        'center',
-      alignItems: 'center',
-    },
+  modalContent: {
+    width: '90%',
+    height: '80%',
+    backgroundColor: colors.white,
+    borderRadius: radius.xl,
+    padding: 20,
+    position: 'relative',
+  },
 
-    closeButtonText: {
-      fontSize: 28,
-      color: '#fff',
-      fontWeight: 'bold',
-    },
+  closeButton: {
+    position: 'absolute',
+    top: 15,
+    right: 15,
+    zIndex: 1,
+    backgroundColor: 'rgba(11, 30, 75, 0.55)',
+    width: 40,
+    height: 40,
+    borderRadius: radius.full,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 
-    fullImage: {
-      width: '100%',
-      height: '100%',
-      borderRadius: 16,
-    },
+  closeButtonText: {
+    fontSize: 24,
+    color: colors.white,
+    fontWeight: font.weight.bold,
+  },
 
-    surveyModalContent: {
-      width: '85%',
-      maxHeight: '82%',
-      backgroundColor:
-        '#fff',
-      borderRadius: 24,
-      padding: 24,
-      position: 'relative',
-      alignItems: 'center',
-    },
+  fullImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: radius.lg,
+  },
 
-    surveyTitle: {
-      fontSize: 20,
-      fontWeight:
-        'bold',
-      marginBottom: 20,
-      color: '#111827',
-    },
+  surveyModalContent: {
+    width: '85%',
+    maxHeight: '82%',
+    backgroundColor: colors.white,
+    borderRadius: radius.xxl,
+    padding: 24,
+    position: 'relative',
+    alignItems: 'center',
+  },
 
-    surveyStatus: {
-      fontSize: 16,
-      color: '#10B981',
-      marginBottom: 32,
-      textAlign: 'center',
-      lineHeight: 24,
-    },
+  surveyTitle: {
+    fontSize: font.size.xl,
+    fontWeight: font.weight.extrabold,
+    marginBottom: 20,
+    color: colors.text,
+  },
 
-    surveyResultScroll: {
-      width: '100%',
-      maxHeight: 420,
-      marginBottom: 20,
-    },
+  surveyStatus: {
+    fontSize: font.size.lg,
+    color: colors.success,
+    marginBottom: 32,
+    textAlign: 'center',
+    lineHeight: font.lineHeight.md,
+  },
 
-    surveyMetaBox: {
-      width: '100%',
-      backgroundColor: '#F3F6FB',
-      borderRadius: 16,
-      padding: 14,
-      marginBottom: 12,
-    },
+  surveyResultScroll: {
+    width: '100%',
+    maxHeight: 420,
+    marginBottom: 20,
+  },
 
-    surveyMetaLabel: {
-      fontSize: 12,
-      color: '#6B7280',
-      marginBottom: 4,
-    },
+  surveyMetaBox: {
+    width: '100%',
+    backgroundColor: colors.surfaceAlt,
+    borderRadius: radius.lg,
+    padding: 14,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: colors.borderSoft,
+  },
 
-    surveyMetaValue: {
-      fontSize: 15,
-      color: '#111827',
-      fontWeight: 'bold',
-      marginBottom: 10,
-    },
+  surveyMetaLabel: {
+    fontSize: font.size.sm,
+    color: colors.textMuted,
+    marginBottom: 4,
+  },
 
-    surveyAnswerRow: {
-      width: '100%',
-      borderBottomWidth: 1,
-      borderBottomColor: '#E5E7EB',
-      paddingVertical: 12,
-    },
+  surveyMetaValue: {
+    fontSize: font.size.md,
+    color: colors.text,
+    fontWeight: font.weight.bold,
+    marginBottom: 10,
+  },
 
-    surveyQuestionText: {
-      fontSize: 14,
-      color: '#374151',
-      lineHeight: 20,
-      marginBottom: 8,
-    },
+  surveyAnswerRow: {
+    width: '100%',
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderSoft,
+    paddingVertical: 12,
+  },
 
-    surveyAnswerValue: {
-      alignSelf: 'flex-start',
-      minWidth: 38,
-      textAlign: 'center',
-      backgroundColor: '#DBEAFE',
-      color: '#1D4ED8',
-      fontWeight: 'bold',
-      borderRadius: 14,
-      paddingHorizontal: 12,
-      paddingVertical: 6,
-    },
+  surveyQuestionText: {
+    fontSize: font.size.base,
+    color: colors.textSoft,
+    lineHeight: font.lineHeight.base,
+    marginBottom: 8,
+  },
 
-    surveyCommentBox: {
-      width: '100%',
-      backgroundColor: '#F9FAFB',
-      borderRadius: 16,
-      padding: 14,
-      marginTop: 12,
-    },
+  surveyAnswerValue: {
+    alignSelf: 'flex-start',
+    minWidth: 38,
+    textAlign: 'center',
+    backgroundColor: colors.navy50,
+    color: colors.primaryBlue,
+    fontWeight: font.weight.bold,
+    borderRadius: radius.full,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
 
-    surveyCommentText: {
-      color: '#374151',
-      lineHeight: 21,
-    },
+  surveyCommentBox: {
+    width: '100%',
+    backgroundColor: colors.surfaceAlt,
+    borderRadius: radius.lg,
+    padding: 14,
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: colors.borderSoft,
+  },
 
-    surveyCloseBtn: {
-      backgroundColor:
-        '#10B981',
-      paddingHorizontal: 32,
-      paddingVertical: 12,
-      borderRadius: 20,
-      minWidth: 120,
-    },
+  surveyCommentText: {
+    color: colors.textSoft,
+    lineHeight: font.lineHeight.base,
+  },
 
-    surveyCloseBtnText: {
-      color: '#fff',
-      fontWeight:
-        'bold',
-      fontSize: 15,
-      textAlign: 'center',
-    },
-  });
+  surveyCloseBtn: {
+    backgroundColor: colors.success,
+    paddingHorizontal: 32,
+    paddingVertical: 12,
+    borderRadius: radius.xl,
+    minWidth: 120,
+  },
+
+  surveyCloseBtnText: {
+    color: colors.white,
+    fontWeight: font.weight.bold,
+    fontSize: font.size.md,
+    textAlign: 'center',
+  },
+});
