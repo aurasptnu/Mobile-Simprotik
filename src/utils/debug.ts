@@ -8,8 +8,8 @@ import { API_BASE_URL } from '../config/api';
 export const debugConfig = {
   apiBaseUrl: API_BASE_URL,
   endpoints: {
-    staffUUID: `${API_BASE_URL}/mobile/staff-uuid`,
-    tasks: `${API_BASE_URL}/mobile/tugas`,
+    staffDemo: `${API_BASE_URL}/master/pengguna/staf`,
+    tasks: `${API_BASE_URL}/mobile/pekerjaan-aktif?id_pengguna={uuid_staf}`,
     projects: `${API_BASE_URL}/mobile/proyek-aktif`,
   },
 };
@@ -24,7 +24,7 @@ export const logDebugInfo = () => {
   console.log('Troubleshooting Checklist:');
   console.log('1. Check if backend API is running and accessible');
   console.log('2. Verify API_BASE_URL in src/config/api.ts is correct');
-  console.log('3. Ensure /api/mobile/staff-uuid endpoint exists in backend');
+  console.log('3. Ensure /api/master/pengguna/staf endpoint returns demo staff users');
   console.log('4. Check backend logs for any errors');
   console.log('5. Verify CORS is enabled if backend is on different domain');
   console.log('6. Use "Test API Connection" button in Login screen to diagnose');

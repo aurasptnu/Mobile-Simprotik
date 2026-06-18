@@ -10,7 +10,7 @@ try {
     mmkvStore = createMMKV({ id: 'simprotik' });
   }
   console.log('MMKV: initialized');
-} catch (e) {
+} catch {
   mmkvStore = null;
   console.log('MMKV not available, will use AsyncStorage/fallback');
 }
@@ -64,7 +64,7 @@ export const getUser = async () => {
   if (inMemoryStore['loggedUser']) {
     try {
       return JSON.parse(inMemoryStore['loggedUser']);
-    } catch (e) {
+    } catch {
       return null;
     }
   }

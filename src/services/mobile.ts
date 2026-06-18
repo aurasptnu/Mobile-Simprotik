@@ -194,6 +194,7 @@ const normalizeList = (payload: any, kind: MobileTaskKind) => {
 
 const normalizeStaffUser = (item: any): StaffUser => {
   const role = String(pick(item, ['role', 'peran', 'level'], '')).toLowerCase();
+  const division = item?.divisi?.nama_divisi || item?.division?.nama_divisi || item?.nama_divisi;
   const uuid = String(
     pick(
       item,
@@ -205,10 +206,10 @@ const normalizeStaffUser = (item: any): StaffUser => {
   return {
     id: uuid || pick(item, ['id'], ''),
     uuid,
-    name: String(pick(item, ['nama', 'name', 'nama_pengguna'], '-')),
+    name: String(pick(item, ['nama_lengkap', 'nama', 'name', 'nama_pengguna'], '-')),
     email: String(pick(item, ['email', 'surel'], '')),
-    nip: String(pick(item, ['nip', 'no_pegawai'], '-')),
-    division: String(pick(item, ['divisi', 'division', 'nama_divisi', 'unit'], '-')),
+    nip: String(pick(item, ['NIP', 'nip', 'no_pegawai'], '-')),
+    division: String(division || '-'),
     role: role || 'staff',
     raw: item,
   };
@@ -221,9 +222,7 @@ const isStaffRole = (item: any) => {
 };
 
 export const getBackendStaffUsers = async () => {
-  const response = await api.get('/mobile/staf', {
-    params: {role: 'staff'},
-  });
+  const response = await api.get('/master/pengguna/staf');
   const staff = unwrapUsers(response.data)
     .filter(isStaffRole)
     .map(normalizeStaffUser)

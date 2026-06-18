@@ -47,17 +47,7 @@ export default function TaskDetailScreen() {
 
   const storageKey = `${task.kind}_${task.rawId || task.id}`;
 
-  useEffect(() => {
-    loadDetail();
-  }, []);
-
-  useFocusEffect(
-    React.useCallback(() => {
-      loadDetail();
-    }, [task.rawId, task.kind]),
-  );
-
-  const loadDetail = async () => {
+  const loadDetail = React.useCallback(async () => {
     setLoadingDetail(true);
 
     try {
@@ -95,7 +85,17 @@ export default function TaskDetailScreen() {
 
       setLoadingDetail(false);
     }
-  };
+  }, [storageKey, task]);
+
+  useEffect(() => {
+    loadDetail();
+  }, [loadDetail]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      loadDetail();
+    }, [loadDetail]),
+  );
 
   const handleUpload = async () => {
     if (dokumenExists || photo) {

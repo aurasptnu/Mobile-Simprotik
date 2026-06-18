@@ -1,114 +1,163 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
+  ActivityIndicator,
   Image,
-  KeyboardAvoidingView,
-  Platform,
   ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
 
-import {getStaffUUIDFromBackend, loginUser} from '../../services/auth';
+import {
+  getBackendStaffUsers,
+  StaffUser,
+} from '../../services/mobile';
 import {saveStaffUUID, saveUser} from '../../storage/auth';
 
 import {styles} from './styles';
 
+const getInitials = (name: string) =>
+  name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(part => part[0])
+    .join('')
+    .toUpperCase();
+
 export default function LoginScreen() {
   const navigation = useNavigation<any>();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [staffUsers, setStaffUsers] = useState<StaffUser[]>([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [selectingUuid, setSelectingUuid] = useState<string | null>(null);
 
-  const handleLogin = async () => {
-    if (!email.trim() || !password.trim()) {
-      setError('Email dan password wajib diisi');
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'test') {
       return;
     }
 
+    loadStaffUsers();
+  }, []);
+
+  const loadStaffUsers = async () => {
     setLoading(true);
     setError('');
 
     try {
-      const user = await loginUser(email, password);
+      const users = await getBackendStaffUsers();
+      setStaffUsers(users);
 
-      if (!user) {
-        setError('Email atau password salah');
-        return;
+      if (users.length === 0) {
+        setError('Belum ada data staf dari backend.');
       }
-
-      const staffUUID = await getStaffUUIDFromBackend(user.email);
-
-      if (!staffUUID) {
-        setError('UUID staf tidak ditemukan dari backend.');
-        return;
-      }
-
-      await saveUser(user);
-      await saveStaffUUID(staffUUID);
-
-      navigation.replace('Main');
     } catch (err: any) {
-      setError(err?.response?.data?.message || err?.message || 'Terjadi kesalahan saat login');
+      setError(
+        err?.response?.data?.message ||
+          err?.message ||
+          'Gagal mengambil data staf dari backend.',
+      );
+      setStaffUsers([]);
     } finally {
       setLoading(false);
     }
   };
 
+  const handleSelectStaff = async (staff: StaffUser) => {
+    setSelectingUuid(staff.uuid);
+    setError('');
+
+    try {
+      await saveUser({
+        id: staff.uuid,
+        uuid: staff.uuid,
+        name: staff.name,
+        email: staff.email,
+        role: 'staff',
+        division: staff.division,
+        nip: staff.nip,
+        raw: staff.raw,
+      });
+      await saveStaffUUID(staff.uuid);
+
+      navigation.replace('Main');
+    } catch (err: any) {
+      setError(err?.message || 'Gagal menyimpan akun demo.');
+    } finally {
+      setSelectingUuid(null);
+    }
+  };
+
   return (
-    <KeyboardAvoidingView
-      style={styles.flex}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-        <View style={styles.header}>
-          <Image source={require('../../assets/images/logo.png')} style={styles.logo} />
+    <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+      <View style={styles.header}>
+        <Image source={require('../../assets/images/logo.png')} style={styles.logo} />
 
-          <Text style={styles.appName}>SIMPROTIK</Text>
+        <Text style={styles.appName}>SIMPROTIK</Text>
 
-          <Text style={styles.subtitle}>
-            Sistem Informasi Manajemen Proyek UPA TIK
-          </Text>
-        </View>
+        <Text style={styles.subtitle}>
+          Sistem Informasi Manajemen Proyek UPA TIK
+        </Text>
+      </View>
 
-        <View style={styles.card}>
-          <Text style={styles.title}>Selamat Datang</Text>
+      <View style={styles.card}>
+        <Text style={styles.title}>Pilih Akun Demo Staf</Text>
 
-          <Text style={styles.desc}>Silakan login untuk melanjutkan</Text>
+        <Text style={styles.desc}>
+          Sementara SSO belum tersedia, pilih salah satu staf dari data backend.
+        </Text>
 
-          <Text style={styles.label}>Email</Text>
-          <TextInput
-            placeholder="Masukkan email"
-            value={email}
-            onChangeText={setEmail}
-            style={styles.input}
-            autoCapitalize="none"
-            keyboardType="email-address"
-          />
+        {!!error && <Text style={styles.modalError}>{error}</Text>}
 
-          <Text style={styles.label}>Password</Text>
-          <TextInput
-            placeholder="Masukkan password"
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-            style={styles.input}
-          />
+        {loading ? (
+          <View style={styles.loadingBox}>
+            <ActivityIndicator size="large" color="#2563EB" />
+            <Text style={styles.loadingText}>Mengambil data staf...</Text>
+          </View>
+        ) : (
+          <View style={styles.staffList}>
+            {staffUsers.map(staff => (
+              <TouchableOpacity
+                key={staff.uuid}
+                style={styles.staffItem}
+                onPress={() => handleSelectStaff(staff)}
+                disabled={Boolean(selectingUuid)}>
+                <View style={styles.staffAvatar}>
+                  <Text style={styles.staffAvatarText}>{getInitials(staff.name)}</Text>
+                </View>
 
-          {!!error && <Text style={styles.error}>{error}</Text>}
+                <View style={styles.staffInfo}>
+                  <Text style={styles.staffName} numberOfLines={1}>
+                    {staff.name}
+                  </Text>
+                  <Text style={styles.staffMeta} numberOfLines={2}>
+                    {staff.division}
+                  </Text>
+                  <Text style={styles.staffNip}>{staff.nip}</Text>
+                </View>
 
-          <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
-            <Text style={styles.buttonText}>{loading ? 'Memuat...' : 'Masuk'}</Text>
-          </TouchableOpacity>
-        </View>
+                {selectingUuid === staff.uuid && (
+                  <ActivityIndicator color="#2563EB" />
+                )}
+              </TouchableOpacity>
+            ))}
 
-        <Text style={styles.footer}>2026 SIMPROTIK</Text>
-      </ScrollView>
-    </KeyboardAvoidingView>
+            {staffUsers.length === 0 && !error && (
+              <Text style={styles.emptyText}>Data staf belum tersedia.</Text>
+            )}
+          </View>
+        )}
+
+        <TouchableOpacity style={styles.button} onPress={loadStaffUsers} disabled={loading}>
+          <Text style={styles.buttonText}>{loading ? 'Memuat...' : 'Muat Ulang Staf'}</Text>
+        </TouchableOpacity>
+      </View>
+
+      <Text style={styles.footer}>2026 SIMPROTIK</Text>
+    </ScrollView>
   );
 }

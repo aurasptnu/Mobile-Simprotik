@@ -53,19 +53,23 @@ export async function getStaffUUIDFromBackend(email: string): Promise<string | n
     console.log(`[UUID] Attempting to fetch UUID from backend for: ${trimmedEmail}`);
     console.log(`[UUID] API Base URL: ${API_BASE_URL}`);
 
-    const response = await api.get('/mobile/staff-uuid', {
-      params: { email: trimmedEmail },
-      timeout: 5000, // 5 second timeout
+    const response = await api.get('/master/pengguna/staf', {
+      timeout: 5000,
     });
 
     console.log(`[UUID] Backend response:`, response.data);
 
-    if (response.data && response.data.uuid) {
-      console.log(`[UUID] Successfully got UUID from backend:`, response.data.uuid);
-      return response.data.uuid;
+    const staff = Array.isArray(response.data?.data) ? response.data.data : [];
+    const matchedStaff = staff.find(
+      (item: any) => String(item.email || '').trim().toLowerCase() === trimmedEmail,
+    );
+
+    if (matchedStaff?.uuid) {
+      console.log(`[UUID] Successfully got UUID from backend:`, matchedStaff.uuid);
+      return matchedStaff.uuid;
     }
 
-    console.log('[UUID] Backend response missing UUID field');
+    console.log('[UUID] Staff email not found in backend demo users');
     return null;
   } catch (error: any) {
     console.error('[UUID] Error getting staff UUID from backend:', {
@@ -97,8 +101,7 @@ export async function testBackendConnection(): Promise<{
 }> {
   try {
     console.log(`[TEST] Testing connection to ${API_BASE_URL}`);
-    const response = await api.get('/mobile/staff-uuid', {
-      params: { email: 'test@test.com' },
+    await api.get('/master/pengguna/staf', {
       timeout: 3000,
     });
 

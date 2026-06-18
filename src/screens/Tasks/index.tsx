@@ -152,9 +152,7 @@ export default function TasksScreen() {
       } finally {
         setLoading(false);
       }
-    }, [
-      navigation,
-    ]);
+    }, []);
 
   const applyFilters = useCallback(() => {
     let myTasks = [...baseTasks];
@@ -358,10 +356,6 @@ export default function TasksScreen() {
         </View>
       </TouchableOpacity>
     );
-
-  const handleSearch = () => {
-    applyFilters();
-  };
 
   return (
     <TouchableWithoutFeedback
