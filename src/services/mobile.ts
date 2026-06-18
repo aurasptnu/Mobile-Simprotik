@@ -121,7 +121,7 @@ const unwrapUsers = (payload: any) => {
 };
 
 export const normalizeStatus = (value: any) => {
-  const raw = String(value || '').trim();
+  const raw = String(value?.nama_status || value?.name || value || '').trim();
   const key = raw.toLowerCase();
 
   return statusMap[key] || raw || '-';
@@ -133,6 +133,8 @@ export const isVisibleMobileStatus = (status: any) =>
 export const normalizeTask = (item: any, kind: MobileTaskKind): MobileTask => {
   const source = unwrap(item);
   const status = normalizeStatus(pick(source, ['status', 'status_tugas'], ''));
+  const unitKerja = pick<any>(source, ['unit_kerja', 'unit_peminta'], null);
+  const suratMasuk = pick<any>(source, ['surat_masuk'], null);
   const rawId = pick(
     source,
     kind === 'proyek'
@@ -150,7 +152,7 @@ export const normalizeTask = (item: any, kind: MobileTaskKind): MobileTask => {
   const documentUrl = pick(
     source,
     ['file_dokumentasi', 'url_dokumentasi', 'dokumen_url', 'file_url'],
-    document?.file || document?.url || null,
+    document?.file || document?.url || document?.file_path || null,
   );
   const assignedTo = pick<any[]>(source, ['staf', 'assignedTo', 'petugas'], []);
 
@@ -161,12 +163,27 @@ export const normalizeTask = (item: any, kind: MobileTaskKind): MobileTask => {
     type: kind === 'proyek' ? 'Proyek' : 'Pekerjaan',
     title: String(pick(source, ['nama_tugas', 'judul', 'nama', 'nama_pekerjaan', 'nama_proyek', 'title'], '-')),
     status,
-    assignedBy: String(pick(source, ['unit_kerja', 'unit_peminta', 'assignedBy', 'klien', 'nama_unit'], '-')),
+    assignedBy: String(
+      unitKerja?.nama_unit ||
+        unitKerja?.name ||
+        pick(source, ['assignedBy', 'klien', 'nama_unit'], '-'),
+    ),
     deadline: String(pick(source, ['target_selesai', 'deadline', 'tanggal_deadline'], '-')),
     location: String(pick(source, ['lokasi', 'location'], '-')),
-    description: String(pick(source, ['deskripsi', 'description', 'keterangan', 'nama_tugas'], '-')),
+    description: String(
+      pick(source, ['deskripsi', 'description', 'keterangan'], suratMasuk?.perihal || source?.nama_tugas || '-'),
+    ),
     assignedTo: Array.isArray(assignedTo)
-      ? assignedTo.map((staff: any) => String(staff?.nama || staff?.name || staff))
+      ? assignedTo.map((staff: any) =>
+          String(
+            staff?.pengguna?.nama_lengkap ||
+              staff?.nama_lengkap ||
+              staff?.nama ||
+              staff?.name ||
+              staff?.id_pengguna ||
+              '-',
+          ),
+        )
       : [String(assignedTo || '-')],
     documentId,
     documentUrl,
@@ -179,7 +196,7 @@ export const normalizeTask = (item: any, kind: MobileTaskKind): MobileTask => {
     surveyCompleted: Boolean(source?.sudah_ada_survei || source?.surveyCompleted || surveyAnswers),
     surveyId: pick(source, ['id_jawaban', 'jawaban_id', 'id_survei'], surveyAnswers?.id || null),
     surveyAnswers,
-    incomingLetter: pick<any>(source, ['surat_masuk'], null),
+    incomingLetter: suratMasuk,
     review: pick<any>(source, ['tinjauan'], null),
     raw: source,
   };
