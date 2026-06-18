@@ -289,9 +289,7 @@ export const uploadFinalDocumentation = async (
   form.append('id_pengguna', staffUuid);
   form.append('dokumentasi_akhir', file as any);
 
-  const response = await api.post(`/mobile/${task.kind}/${task.rawId}/dokumentasi-akhir`, form, {
-    headers: {'Content-Type': 'multipart/form-data'},
-  });
+  const response = await api.post(`/mobile/${task.kind}/${task.rawId}/dokumentasi-akhir`, form);
 
   return response.data;
 };

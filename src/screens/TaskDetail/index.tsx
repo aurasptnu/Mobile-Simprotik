@@ -132,10 +132,12 @@ export default function TaskDetailScreen() {
         name: filename,
         type: asset.type || 'image/jpeg',
       });
+      const uploadedTinjauan = uploadRes?.data || uploadRes;
+      const uploadedDokumen = uploadedTinjauan?.dokumen;
 
       setDokumenExists(true);
-      setDokumenId(uploadRes?.id_dokumen || uploadRes?.id || null);
-      setDokumenUrl(uploadRes?.dokumen?.file || uploadRes?.dokumen?.url || null);
+      setDokumenId(uploadedTinjauan?.id_dokumen || uploadedDokumen?.id_dokumen || null);
+      setDokumenUrl(uploadedDokumen?.file || uploadedDokumen?.url || uploadedDokumen?.file_path || null);
       setPhoto(uri);
       await AsyncStorage.setItem(`task_doc_${storageKey}`, uri);
     } catch (error) {
