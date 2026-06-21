@@ -61,7 +61,7 @@ Backend harus memiliki endpoint-endpoint ini:
 
 ### 1. Get Staff UUID
 ```bash
-GET /api/mobile/staff-uuid?email=yeni.farida@upatik.com
+GET /api/master/pengguna/staf?search=198610032025212042
 
 Response:
 {
@@ -71,7 +71,7 @@ Response:
 
 **Test dengan cURL:**
 ```bash
-curl -X GET "http://localhost:8000/api/mobile/staff-uuid?email=yeni.farida@upatik.com"
+curl -X GET "http://localhost:8000/api/master/pengguna/staf?search=198610032025212042"
 ```
 
 ### 2. Get Tasks
@@ -175,7 +175,7 @@ Jika `USE_MOCK_UUID_ON_ERROR = true`:
 
 **Semua akun pakai password: `123456`**
 
-| Email | Name |
+| NIP | Name |
 |-------|------|
 | yeni.farida@upatik.com | Yeni Farida, A.M. |
 | wahozin@upatik.com | Wahozin |
@@ -226,6 +226,6 @@ testBackendConnection().then(result => {
 2. **Test Endpoint Manually** - gunakan Postman atau cURL
 3. **Enable Debug Logging** - check React Native console
 4. **Check Network** - pastikan firewall/VPN tidak block API
-5. **Verify Credentials** - pastikan email/UUID benar di database
+5. **Verify Credentials** - pastikan NIP/UUID benar di database
 
 Butuh bantuan? Check logs untuk error details yang spesifik!

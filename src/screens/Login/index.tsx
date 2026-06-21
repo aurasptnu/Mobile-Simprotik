@@ -77,7 +77,6 @@ export default function LoginScreen() {
         id: staff.uuid,
         uuid: staff.uuid,
         name: staff.name,
-        email: staff.email,
         role: 'staff',
         division: staff.division,
         nip: staff.nip,

@@ -122,13 +122,13 @@ export default function TasksScreen() {
 
         // If remote didn't provide tasks, filter local mock tasks
         if (!myTasks || myTasks.length === 0) {
-          const userEmail = String(user.email || '').trim().toLowerCase();
+          const userNip = String(user.nip || '').trim();
 
           myTasks = tasks.filter(task => {
             const assigned = task.assignedTo;
             const isAssigned = Array.isArray(assigned)
-              ? assigned.map((a: any) => String(a).trim().toLowerCase()).includes(userEmail)
-              : String(assigned).trim().toLowerCase() === userEmail;
+              ? assigned.map((a: any) => String(a).trim()).includes(userNip)
+              : String(assigned).trim() === userNip;
 
             return isAssigned && task.isStarted === true;
           });

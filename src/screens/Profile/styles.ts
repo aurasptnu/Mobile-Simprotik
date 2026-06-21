@@ -38,7 +38,7 @@ export const styles =
       color: colors.text,
     },
 
-    email: {
+    identity: {
       fontSize: font.size.md,
       color: colors.textSoft,
       marginTop: 8,

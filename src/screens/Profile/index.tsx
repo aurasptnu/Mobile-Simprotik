@@ -73,7 +73,7 @@ export default function ProfileScreen() {
 
         <Text style={styles.name}>{user?.name}</Text>
         <Text style={styles.role}>{roleLabel}</Text>
-        <Text style={styles.email}>{user?.email}</Text>
+        <Text style={styles.identity}>{user?.nip}</Text>
       </View>
 
       <View style={styles.detailCard}>
@@ -89,10 +89,6 @@ export default function ProfileScreen() {
           <Text style={styles.detailValue}>{user?.nip ?? '-'}</Text>
         </View>
 
-        <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>Email</Text>
-          <Text style={styles.detailValue}>{user?.email ?? '-'}</Text>
-        </View>
       </View>
 
       <TouchableOpacity

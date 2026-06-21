@@ -29,7 +29,6 @@ export type StaffUser = {
   id: string | number;
   uuid: string;
   name: string;
-  email: string;
   nip: string;
   division: string;
   role: string;
@@ -224,7 +223,6 @@ const normalizeStaffUser = (item: any): StaffUser => {
     id: uuid || pick(item, ['id'], ''),
     uuid,
     name: String(pick(item, ['nama_lengkap', 'nama', 'name', 'nama_pengguna'], '-')),
-    email: String(pick(item, ['email', 'surel'], '')),
     nip: String(pick(item, ['NIP', 'nip', 'no_pegawai'], '-')),
     division: String(division || '-'),
     role: role || 'staff',

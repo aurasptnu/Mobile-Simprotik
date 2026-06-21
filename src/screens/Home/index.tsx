@@ -95,13 +95,13 @@ export default function HomeScreen() {
 
       if (!combined || combined.length === 0) {
         // fallback ke local mock jika backend kosong
-        const userEmail = String(loggedUser.email || '').trim().toLowerCase();
+        const userNip = String(loggedUser.nip || '').trim();
 
         combined = tasks.filter(task => {
           const assigned = task.assignedTo;
           const isAssigned = Array.isArray(assigned)
-            ? assigned.map(a => String(a).trim().toLowerCase()).includes(userEmail)
-            : String(assigned).trim().toLowerCase() === userEmail;
+            ? assigned.map(a => String(a).trim()).includes(userNip)
+            : String(assigned).trim() === userNip;
 
           return isAssigned && task.isStarted;
         });
