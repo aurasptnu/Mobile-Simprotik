@@ -3,6 +3,7 @@ import React, {useEffect, useState} from 'react';
 import {
   ActivityIndicator,
   Image,
+  Linking,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -19,6 +20,7 @@ import {saveStaffUUID, saveUser} from '../../storage/auth';
 
 import {styles} from './styles';
 import {colors} from '../../theme';
+import {SSO_LOGIN_URL} from '../../config/api';
 
 const getInitials = (name: string) =>
   name
@@ -68,6 +70,21 @@ export default function LoginScreen() {
     }
   };
 
+  const handleSSOLogin = async () => {
+    setError('');
+
+    try {
+      const supported = await Linking.canOpenURL(SSO_LOGIN_URL);
+      if (!supported) {
+        setError('Perangkat tidak bisa membuka halaman SSO.');
+        return;
+      }
+
+      await Linking.openURL(SSO_LOGIN_URL);
+    } catch (err: any) {
+      setError(err?.message || 'Gagal membuka halaman SSO.');
+    }
+  };
   const handleSelectStaff = async (staff: StaffUser) => {
     setSelectingUuid(staff.uuid);
     setError('');
@@ -105,11 +122,17 @@ export default function LoginScreen() {
       </View>
 
       <View style={styles.card}>
-        <Text style={styles.title}>Pilih Akun Demo Staf</Text>
+        <Text style={styles.title}>Masuk ke SIMPROTIK</Text>
 
         <Text style={styles.desc}>
-          Sementara SSO belum tersedia, pilih salah satu staf dari data backend.
+          Gunakan SSO Unila untuk masuk. Jika sedang pengujian, pilih akun demo staf dari data backend.
         </Text>
+
+        <TouchableOpacity style={styles.button} onPress={handleSSOLogin}>
+          <Text style={styles.buttonText}>Masuk dengan SSO Unila</Text>
+        </TouchableOpacity>
+
+        <Text style={styles.demoTitle}>Akun Demo Staf</Text>
 
         {!!error && <Text style={styles.modalError}>{error}</Text>}
 
@@ -161,3 +184,4 @@ export default function LoginScreen() {
     </ScrollView>
   );
 }
+

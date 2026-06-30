@@ -247,6 +247,14 @@ export const styles =
       paddingVertical: 32,
     },
 
+    demoTitle: {
+      color: colors.text,
+      fontSize: font.size.base,
+      fontWeight: font.weight.bold,
+      marginTop: 22,
+      marginBottom: 12,
+    },
+
     modalError: {
       color: colors.danger,
       backgroundColor: colors.dangerLight,
@@ -257,3 +265,4 @@ export const styles =
       lineHeight: 18,
     },
   });
+
