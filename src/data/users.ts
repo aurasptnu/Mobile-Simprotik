@@ -2,7 +2,7 @@ export const users = [
   {
     id: 1,
     name: 'Yeni Farida, A.M.',
-    password: '123456',
+    password: 'simprotik123',
     role: 'staff',
     division: 'Bendahara Pengeluaran Pembantu (BPP UPA TIK)',
     nip: '198765432100001',
@@ -11,7 +11,7 @@ export const users = [
   {
     id: 2,
     name: 'Wahozin',
-    password: '123456',
+    password: 'simprotik123',
     role: 'staff',
     division: 'Bendahara Pengeluaran Pembantu (BPP UPA TIK)',
     nip: '198765432100002',
@@ -20,7 +20,7 @@ export const users = [
   {
     id: 3,
     name: 'Rahmadona',
-    password: '123456',
+    password: 'simprotik123',
     role: 'staff',
     division: 'Bendahara Pengeluaran Pembantu (BPP UPA TIK)',
     nip: '198765432100003',
@@ -29,7 +29,7 @@ export const users = [
   {
     id: 4,
     name: 'Supriyanto',
-    password: '123456',
+    password: 'simprotik123',
     role: 'staff',
     division: 'Bendahara Pengeluaran Pembantu (BPP UPA TIK)',
     nip: '198765432100004',
@@ -38,7 +38,7 @@ export const users = [
   {
     id: 5,
     name: 'Nokimala',
-    password: '123456',
+    password: 'simprotik123',
     role: 'staff',
     division: 'Bendahara Pengeluaran Pembantu (BPP UPA TIK)',
     nip: '198765432100005',
@@ -47,7 +47,7 @@ export const users = [
   {
     id: 6,
     name: 'Nurrahma, S.Kom., M.T.',
-    password: '123456',
+    password: 'simprotik123',
     role: 'staff',
     division: 'Pokja Pengembangan dan Inovasi Teknologi Informasi',
     nip: '198765432100006',
@@ -56,7 +56,7 @@ export const users = [
   {
     id: 7,
     name: 'Aditya Dwi Abrianto, S.E.',
-    password: '123456',
+    password: 'simprotik123',
     role: 'staff',
     division: 'Pokja Layanan Sistem dan Teknologi Informasi',
     nip: '198765432100007',
@@ -65,7 +65,7 @@ export const users = [
   {
     id: 8,
     name: 'Boby Mardani, S.Kom., M.M.',
-    password: '123456',
+    password: 'simprotik123',
     role: 'staff',
     division: 'Pokja Layanan Sistem dan Teknologi Informasi',
     nip: '198765432100008',
@@ -74,7 +74,7 @@ export const users = [
   {
     id: 9,
     name: 'Alifan Akbar Ikhsansah, A.Md.',
-    password: '123456',
+    password: 'simprotik123',
     role: 'staff',
     division: 'Pokja Layanan Sistem dan Teknologi Informasi',
     nip: '198765432100009',
@@ -83,7 +83,7 @@ export const users = [
   {
     id: 10,
     name: 'Atika Istiqomah, S.Kom., M.T.',
-    password: '123456',
+    password: 'simprotik123',
     role: 'staff',
     division: 'Pokja Manajemen dan Integrasi Sistem Informasi',
     nip: '198765432100010',
@@ -92,7 +92,7 @@ export const users = [
   {
     id: 11,
     name: 'Aprily Ayu Ambar, S.T.',
-    password: '123456',
+    password: 'simprotik123',
     role: 'staff',
     division: 'Pokja Manajemen dan Integrasi Sistem Informasi',
     nip: '198765432100011',
@@ -101,7 +101,7 @@ export const users = [
   {
     id: 12,
     name: 'Mizar Zulmi, S.Kom.',
-    password: '123456',
+    password: 'simprotik123',
     role: 'staff',
     division: 'Pokja Manajemen dan Integrasi Sistem Informasi',
     nip: '198765432100012',
@@ -110,7 +110,7 @@ export const users = [
   {
     id: 13,
     name: 'Nyoman Herman Ardike, S.T.',
-    password: '123456',
+    password: 'simprotik123',
     role: 'staff',
     division: 'Pokja Infrastruktur Jaringan',
     nip: '198765432100013',
@@ -119,7 +119,7 @@ export const users = [
   {
     id: 14,
     name: 'Kasdi Pratama, A.Md.',
-    password: '123456',
+    password: 'simprotik123',
     role: 'staff',
     division: 'Pokja Infrastruktur Jaringan',
     nip: '198765432100014',
@@ -128,7 +128,7 @@ export const users = [
   {
     id: 15,
     name: 'Gontor Ganta Nama, S.T.',
-    password: '123456',
+    password: 'simprotik123',
     role: 'staff',
     division: 'Pokja Infrastruktur Jaringan',
     nip: '198765432100015',
@@ -137,7 +137,7 @@ export const users = [
   {
     id: 16,
     name: 'Rahmad Junaidi',
-    password: '123456',
+    password: 'simprotik123',
     role: 'staff',
     division: 'Pokja Infrastruktur Jaringan',
     nip: '198765432100016',
@@ -146,7 +146,7 @@ export const users = [
   {
     id: 17,
     name: 'Aditya Anggi',
-    password: '123456',
+    password: 'simprotik123',
     role: 'staff',
     division: 'Pokja Infrastruktur Jaringan',
     nip: '198765432100017',
@@ -155,7 +155,7 @@ export const users = [
   {
     id: 18,
     name: 'Kholik Farijal, S.Kom.',
-    password: '123456',
+    password: 'simprotik123',
     role: 'staff',
     division: 'Pokja Sumber Daya Sistem Informasi',
     nip: '198765432100018',
@@ -164,7 +164,7 @@ export const users = [
   {
     id: 19,
     name: 'Rika Ningtias Azhari, S.Kom., M.Kom.',
-    password: '123456',
+    password: 'simprotik123',
     role: 'staff',
     division: 'Pokja Sumber Daya Sistem Informasi',
     nip: '198765432100019',
@@ -173,7 +173,7 @@ export const users = [
   {
     id: 20,
     name: 'Zuliana Nurfadlillah, S.Kom.',
-    password: '123456',
+    password: 'simprotik123',
     role: 'staff',
     division: 'Pokja Sumber Daya Sistem Informasi',
     nip: '198765432100020',
@@ -182,7 +182,7 @@ export const users = [
   {
     id: 21,
     name: 'Muhammad Nur Khawarizmi, S.Si., M.T.',
-    password: '123456',
+    password: 'simprotik123',
     role: 'staff',
     division: 'Pokja Pusat Data dan Keamanan Informasi',
     nip: '198765432100021',
@@ -191,7 +191,7 @@ export const users = [
   {
     id: 22,
     name: 'Rizkima Akbar Setiawan, S.T., M.T.',
-    password: '123456',
+    password: 'simprotik123',
     role: 'staff',
     division: 'Pokja Pusat Data dan Keamanan Informasi',
     nip: '198765432100022',
@@ -200,7 +200,7 @@ export const users = [
   {
     id: 23,
     name: 'Harno, S.I.Kom.',
-    password: '123456',
+    password: 'simprotik123',
     role: 'staff',
     division: 'Pokja Pusat Data dan Keamanan Informasi',
     nip: '198765432100023',
@@ -209,10 +209,11 @@ export const users = [
   {
     id: 24,
     name: 'Ikhwan Catur Nugroho, S.Pi.',
-    password: '123456',
+    password: 'simprotik123',
     role: 'staff',
     division: 'Pokja Pusat Data dan Keamanan Informasi',
     nip: '198765432100024',
     photo: 'https://i.pravatar.cc/150?img=30',
   },
 ];
+

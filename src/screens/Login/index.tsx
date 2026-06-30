@@ -6,6 +6,7 @@ import {
   Linking,
   ScrollView,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -37,6 +38,9 @@ export default function LoginScreen() {
   const [staffUsers, setStaffUsers] = useState<StaffUser[]>([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [manualNip, setManualNip] = useState('');
+  const [manualPassword, setManualPassword] = useState('');
+  const [manualLoading, setManualLoading] = useState(false);
   const [selectingUuid, setSelectingUuid] = useState<string | null>(null);
 
   useEffect(() => {
@@ -85,6 +89,48 @@ export default function LoginScreen() {
       setError(err?.message || 'Gagal membuka halaman SSO.');
     }
   };
+
+  const handleManualLogin = async () => {
+    const nip = manualNip.trim();
+    const password = manualPassword.trim();
+    setError('');
+
+    if (!nip || !password) {
+      setError('NIP dan password wajib diisi.');
+      return;
+    }
+
+    setManualLoading(true);
+
+    try {
+      const users = staffUsers.length > 0 ? staffUsers : await getBackendStaffUsers();
+      if (staffUsers.length === 0) {
+        setStaffUsers(users);
+      }
+
+      const matchedStaff = users.find(staff => String(staff.nip).trim() === nip);
+      if (!matchedStaff) {
+        setError('NIP tidak terdaftar sebagai staf SIMPROTIK.');
+        return;
+      }
+
+      if (password !== 'simprotik123') {
+        setError('Password salah.');
+        return;
+      }
+
+      await handleSelectStaff(matchedStaff);
+    } catch (err: any) {
+      setError(
+        err?.response?.data?.message ||
+          err?.message ||
+          'Gagal login manual.',
+      );
+    } finally {
+      setManualLoading(false);
+    }
+  };
+
   const handleSelectStaff = async (staff: StaffUser) => {
     setSelectingUuid(staff.uuid);
     setError('');
@@ -130,6 +176,32 @@ export default function LoginScreen() {
 
         <TouchableOpacity style={styles.button} onPress={handleSSOLogin}>
           <Text style={styles.buttonText}>Masuk dengan SSO Unila</Text>
+        </TouchableOpacity>
+
+        <Text style={styles.demoTitle}>Login Manual Staf</Text>
+        <TextInput
+          value={manualNip}
+          onChangeText={setManualNip}
+          placeholder="Masukkan NIP"
+          keyboardType="number-pad"
+          autoCapitalize="none"
+          style={styles.input}
+        />
+        <TextInput
+          value={manualPassword}
+          onChangeText={setManualPassword}
+          placeholder="Masukkan password"
+          secureTextEntry
+          autoCapitalize="none"
+          style={styles.input}
+        />
+        <TouchableOpacity
+          style={styles.manualButton}
+          onPress={handleManualLogin}
+          disabled={manualLoading}>
+          <Text style={styles.buttonText}>
+            {manualLoading ? 'Memproses...' : 'Masuk Manual'}
+          </Text>
         </TouchableOpacity>
 
         <Text style={styles.demoTitle}>Akun Demo Staf</Text>
@@ -184,4 +256,5 @@ export default function LoginScreen() {
     </ScrollView>
   );
 }
+
 

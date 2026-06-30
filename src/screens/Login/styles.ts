@@ -89,6 +89,7 @@ export const styles =
       paddingVertical: 14,
       backgroundColor:
         colors.surfaceAlt,
+      marginBottom: 10,
     },
 
     error: {
@@ -111,6 +112,15 @@ export const styles =
       fontWeight:
         font.weight.bold,
       fontSize: font.size.lg,
+    },
+
+    manualButton: {
+      backgroundColor:
+        colors.primaryBlue,
+      paddingVertical: 16,
+      borderRadius: radius.lg,
+      marginTop: 4,
+      marginBottom: 4,
     },
 
     footer: {
