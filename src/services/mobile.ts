@@ -35,6 +35,14 @@ export type StaffUser = {
   raw: any;
 };
 
+export type LoginUserResponse = {
+  uuid: string;
+  nama_lengkap: string;
+  NIP: string;
+  peran: string;
+  divisi?: {uuid: string; nama_divisi: string} | null;
+};
+
 export type MobileSurveyQuestion = {
   id: string;
   text: string;
@@ -244,6 +252,21 @@ export const getBackendStaffUsers = async () => {
     .filter((item: StaffUser) => item.uuid);
 
   return staff;
+};
+
+export const loginManualUser = async (nip: string, password: string) => {
+  const response = await api.post('/login', {nip, password});
+  const user = response.data?.data as LoginUserResponse | undefined;
+
+  if (!user?.uuid) {
+    throw new Error('Data pengguna dari backend tidak lengkap.');
+  }
+
+  if (String(user.peran || '').toLowerCase() !== 'staf') {
+    throw new Error('Aplikasi mobile hanya tersedia untuk pengguna dengan role Staf.');
+  }
+
+  return normalizeStaffUser(user);
 };
 
 export const getDashboard = async (staffUuid: string) => {
