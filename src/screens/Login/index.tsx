@@ -15,6 +15,7 @@ import {useNavigation} from '@react-navigation/native';
 
 import {
   getBackendStaffUsers,
+  loginManualUser,
   StaffUser,
 } from '../../services/mobile';
 import {saveStaffUUID, saveUser} from '../../storage/auth';
@@ -103,22 +104,7 @@ export default function LoginScreen() {
     setManualLoading(true);
 
     try {
-      const users = staffUsers.length > 0 ? staffUsers : await getBackendStaffUsers();
-      if (staffUsers.length === 0) {
-        setStaffUsers(users);
-      }
-
-      const matchedStaff = users.find(staff => String(staff.nip).trim() === nip);
-      if (!matchedStaff) {
-        setError('NIP tidak terdaftar sebagai staf SIMPROTIK.');
-        return;
-      }
-
-      if (password !== 'simprotik123') {
-        setError('Password salah.');
-        return;
-      }
-
+      const matchedStaff = await loginManualUser(nip, password);
       await handleSelectStaff(matchedStaff);
     } catch (err: any) {
       setError(
