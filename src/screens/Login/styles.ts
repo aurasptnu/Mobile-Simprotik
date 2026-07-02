@@ -1,278 +1,151 @@
-import {
-  StyleSheet,
-} from 'react-native';
+import {StyleSheet} from 'react-native';
 import {colors, font, radius, shadow} from '../../theme';
 
-export const styles =
-  StyleSheet.create({
-    flex: {
-      flex: 1,
-      backgroundColor:
-        colors.surfaceAlt,
-    },
+export const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: colors.surfaceAlt,
+  },
 
-    container: {
-      flexGrow: 1,
-      justifyContent:
-        'center',
-      padding: 24,
-    },
+  container: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    padding: 24,
+  },
 
-    header: {
-      alignItems: 'center',
-      marginBottom: 30,
-    },
+  header: {
+    alignItems: 'center',
+    marginBottom: 30,
+  },
 
-    logo: {
-      width: 230,
-      height: 108,
-      resizeMode:
-        'contain',
-      marginBottom: 16,
-    },
+  logo: {
+    width: 230,
+    height: 108,
+    resizeMode: 'contain',
+    marginBottom: 16,
+  },
 
-    appName: {
-      fontSize: font.size.display,
-      fontWeight:
-        font.weight.extrabold,
-      color:
-        colors.text,
-    },
+  appName: {
+    fontSize: font.size.display,
+    fontWeight: font.weight.extrabold,
+    color: colors.text,
+  },
 
-    subtitle: {
-      marginTop: 6,
-      textAlign: 'center',
-      color: colors.textSoft,
-      fontSize: font.size.base,
-    },
+  subtitle: {
+    marginTop: 6,
+    textAlign: 'center',
+    color: colors.textSoft,
+    fontSize: font.size.base,
+  },
 
-    card: {
-      backgroundColor:
-        colors.white,
-      borderRadius: radius.xxl,
-      padding: 24,
-      borderWidth: 1,
-      borderColor: colors.borderSoft,
-      ...shadow.card,
-    },
+  card: {
+    backgroundColor: colors.white,
+    borderRadius: radius.xxl,
+    padding: 24,
+    borderWidth: 1,
+    borderColor: colors.borderSoft,
+    ...shadow.card,
+  },
 
-    title: {
-      fontSize: font.size.xxl,
-      fontWeight:
-        font.weight.extrabold,
-      color:
-        colors.text,
-    },
+  title: {
+    fontSize: font.size.xxl,
+    fontWeight: font.weight.extrabold,
+    color: colors.text,
+  },
 
-    desc: {
-      marginTop: 5,
-      color: colors.textSoft,
-      marginBottom: 24,
-    },
+  desc: {
+    marginTop: 8,
+    color: colors.textSoft,
+    marginBottom: 24,
+    lineHeight: 22,
+  },
 
-    label: {
-      fontSize: font.size.base,
-      fontWeight:
-        font.weight.semibold,
-      marginBottom: 8,
-      marginTop: 12,
-      color:
-        colors.text,
-    },
+  ssoButton: {
+    backgroundColor: colors.primaryBlue,
+    paddingVertical: 16,
+    paddingHorizontal: 18,
+    borderRadius: radius.lg,
+    marginBottom: 10,
+  },
 
-    input: {
-      borderWidth: 1,
-      borderColor:
-        colors.border,
-      borderRadius: radius.md,
-      paddingHorizontal: 18,
-      paddingVertical: 14,
-      backgroundColor:
-        colors.surfaceAlt,
-      marginBottom: 10,
-    },
+  ssoButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
 
-    error: {
-      color: colors.danger,
-      marginTop: 10,
-    },
+  ssoButtonLabel: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
 
-    button: {
-      backgroundColor:
-        colors.primaryBlue,
-      paddingVertical: 18,
-      borderRadius: radius.lg,
-      marginTop: 25,
-    },
+  ssoLabelText: {
+    flex: 1,
+    marginLeft: 14,
+  },
 
-    buttonText: {
-      color: colors.white,
-      textAlign:
-        'center',
-      fontWeight:
-        font.weight.bold,
-      fontSize: font.size.lg,
-    },
+  buttonIcon: {
+    width: 20,
+    height: 20,
+    resizeMode: 'contain',
+    tintColor: colors.white,
+  },
 
-    manualButton: {
-      backgroundColor:
-        colors.primaryBlue,
-      paddingVertical: 16,
-      borderRadius: radius.lg,
-      marginTop: 4,
-      marginBottom: 4,
-    },
+  buttonArrow: {
+    width: 18,
+    height: 18,
+    resizeMode: 'contain',
+    marginLeft: 12,
+    tintColor: colors.white,
+  },
 
-    footer: {
-      textAlign: 'center',
-      marginTop: 30,
-      color: colors.textMuted,
-      fontSize: font.size.sm,
-    },
+  ssoButtonText: {
+    color: colors.white,
+    fontWeight: font.weight.bold,
+    fontSize: font.size.lg,
+    textAlign: 'left',
+  },
 
-    modalOverlay: {
-      position: 'absolute',
-      top: 0,
-      right: 0,
-      bottom: 0,
-      left: 0,
-      backgroundColor: 'rgba(11, 30, 75, 0.48)',
-      justifyContent: 'flex-end',
-      zIndex: 20,
-      elevation: 20,
-    },
+  ssoButtonSubtitle: {
+    color: colors.white,
+    fontSize: font.size.sm,
+    marginTop: 4,
+    opacity: 0.9,
+    textAlign: 'left',
+  },
 
-    modalContent: {
-      backgroundColor: colors.white,
-      borderTopLeftRadius: radius.xxl,
-      borderTopRightRadius: radius.xxl,
-      maxHeight: '82%',
-      paddingHorizontal: 20,
-      paddingTop: 18,
-      paddingBottom: 24,
-    },
+  ssoHintLink: {
+    marginTop: 8,
+    alignItems: 'center',
+  },
 
-    modalHeader: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginBottom: 14,
-    },
+  ssoHintText: {
+    color: colors.textSoft,
+    fontSize: font.size.sm,
+    lineHeight: 22,
+    textAlign: 'center',
+  },
 
-    modalTitle: {
-      fontSize: font.size.modalTitle,
-      fontWeight: font.weight.extrabold,
-      color: colors.text,
-    },
+  ssoHintStrong: {
+    fontWeight: font.weight.bold,
+  },
 
-    modalSubtitle: {
-      color: colors.textSoft,
-      marginTop: 4,
-    },
+  modalError: {
+    color: colors.danger,
+    backgroundColor: colors.dangerLight,
+    borderRadius: radius.md,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginTop: 16,
+    lineHeight: 18,
+  },
 
-    modalCloseButton: {
-      width: 38,
-      height: 38,
-      borderRadius: radius.full,
-      backgroundColor: colors.surface2,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-
-    modalCloseText: {
-      color: colors.text,
-      fontWeight: font.weight.bold,
-      fontSize: font.size.lg,
-    },
-
-    staffList: {
-      paddingBottom: 8,
-    },
-
-    staffItem: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: colors.surfaceAlt,
-      borderWidth: 1,
-      borderColor: colors.border,
-      borderRadius: radius.lg,
-      padding: 14,
-      marginBottom: 10,
-    },
-
-    staffAvatar: {
-      width: 42,
-      height: 42,
-      borderRadius: radius.full,
-      backgroundColor: colors.gold,
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginRight: 12,
-    },
-
-    staffAvatarText: {
-      color: colors.text,
-      fontWeight: font.weight.bold,
-      fontSize: font.size.cardTitle,
-    },
-
-    staffInfo: {
-      flex: 1,
-      minWidth: 0,
-    },
-
-    staffName: {
-      color: colors.text,
-      fontWeight: font.weight.bold,
-      fontSize: font.size.md,
-      marginBottom: 4,
-    },
-
-    staffMeta: {
-      color: colors.textSoft,
-      fontSize: font.size.sm,
-      lineHeight: 17,
-    },
-
-    staffNip: {
-      color: colors.textMuted,
-      fontSize: font.size.sm,
-      marginTop: 4,
-    },
-
-    loadingBox: {
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingVertical: 36,
-    },
-
-    loadingText: {
-      color: colors.textSoft,
-      marginTop: 12,
-    },
-
-    emptyText: {
-      color: colors.textSoft,
-      textAlign: 'center',
-      paddingVertical: 32,
-    },
-
-    demoTitle: {
-      color: colors.text,
-      fontSize: font.size.base,
-      fontWeight: font.weight.bold,
-      marginTop: 22,
-      marginBottom: 12,
-    },
-
-    modalError: {
-      color: colors.danger,
-      backgroundColor: colors.dangerLight,
-      borderRadius: radius.md,
-      paddingHorizontal: 12,
-      paddingVertical: 10,
-      marginBottom: 12,
-      lineHeight: 18,
-    },
-  });
+  footer: {
+    textAlign: 'center',
+    marginTop: 30,
+    color: colors.textMuted,
+    fontSize: font.size.sm,
+  },
+});
 
