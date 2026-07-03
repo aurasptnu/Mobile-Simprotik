@@ -69,7 +69,7 @@ export default function LoginScreen() {
         <View style={styles.ssoHintLink}>
           <Text style={styles.ssoHintText}>SSO dalam maintenance?</Text>
           <TouchableOpacity onPress={handleNavigateManual}>
-            <Text style={[styles.ssoHintText, styles.ssoHintStrong]}>Masuk dengan NIP</Text>
+            <Text style={[styles.ssoHintText, styles.ssoHintStrong]}>Masuk manual</Text>
           </TouchableOpacity>
         </View>
 

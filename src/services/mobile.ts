@@ -269,6 +269,25 @@ export const loginManualUser = async (nip: string, password: string) => {
   return normalizeStaffUser(user);
 };
 
+export const loginWithSSOToken = async (token: string) => {
+  const response = await api.post('/auth/sso/verify', {token});
+  const user = response.data?.data as LoginUserResponse | undefined;
+
+  if (!user?.uuid) {
+    throw new Error('Data pengguna dari SSO tidak lengkap.');
+  }
+
+  if (String(user.peran || '').toLowerCase() !== 'staf') {
+    throw new Error('Aplikasi mobile hanya tersedia untuk pengguna dengan role Staf.');
+  }
+
+  if (String((user as any).status_akun || 'aktif').toLowerCase() !== 'aktif') {
+    throw new Error('Akun SSO sudah tercatat dan menunggu aktivasi Admin Akses.');
+  }
+
+  return normalizeStaffUser(user);
+};
+
 export const getDashboard = async (staffUuid: string) => {
   const response = await api.get('/dashboard/staf', {
     params: {id_pengguna: staffUuid},

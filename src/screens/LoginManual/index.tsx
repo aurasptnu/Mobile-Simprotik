@@ -12,7 +12,7 @@ import {
 
 import {useNavigation} from '@react-navigation/native';
 
-import {getBackendStaffUsers, StaffUser} from '../../services/mobile';
+import {loginManualUser} from '../../services/mobile';
 import {saveStaffUUID, saveUser} from '../../storage/auth';
 import {styles} from './styles';
 import {colors} from '../../theme';
@@ -22,36 +22,25 @@ const arrowIcon = require('../../assets/images/panah.png');
 export default function LoginManualScreen() {
   const navigation = useNavigation<any>();
 
-  const [manualNip, setManualNip] = useState('');
+  const [manualUsername, setManualUsername] = useState('');
   const [manualPassword, setManualPassword] = useState('');
   const [manualLoading, setManualLoading] = useState(false);
   const [error, setError] = useState('');
 
   const handleManualLogin = async () => {
-    const nip = manualNip.trim();
+    const username = manualUsername.trim();
     const password = manualPassword.trim();
     setError('');
 
-    if (!nip || !password) {
-      setError('NIP dan password wajib diisi.');
+    if (!username || !password) {
+      setError('Username SSO/NIP dan password wajib diisi.');
       return;
     }
 
     setManualLoading(true);
 
     try {
-      const users = await getBackendStaffUsers();
-      const matchedStaff = users.find(staff => String(staff.nip).trim() === nip);
-
-      if (!matchedStaff) {
-        setError('NIP tidak terdaftar sebagai staf SIMPROTIK.');
-        return;
-      }
-
-      if (password !== 'simprotik123') {
-        setError('Password salah.');
-        return;
-      }
+      const matchedStaff = await loginManualUser(username, password);
 
       await saveUser({
         id: matchedStaff.uuid,
@@ -78,16 +67,16 @@ export default function LoginManualScreen() {
         <Text style={styles.title}>Masuk dengan NIP</Text>
 
         <Text style={styles.desc}>
-          Pastikan NIP terdaftar.
+          Gunakan username SSO atau NIP yang sudah aktif di SIMPROTIK.
         </Text>
 
         {!!error && <Text style={styles.modalError}>{error}</Text>}
 
         <TextInput
-          value={manualNip}
-          onChangeText={setManualNip}
-          placeholder="Masukkan NIP"
-          keyboardType="number-pad"
+          value={manualUsername}
+          onChangeText={setManualUsername}
+          placeholder="Masukkan username SSO / NIP"
+          keyboardType="default"
           autoCapitalize="none"
           style={styles.input}
         />
