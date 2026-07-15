@@ -50,7 +50,7 @@ export type MobileSurveyQuestion = {
   options?: string[];
 };
 
-const visibleStatuses = ['Sedang Berlangsung', 'Dalam Tinjauan', 'Selesai'];
+const visibleStatuses = ['Ditugaskan', 'Sedang Berlangsung', 'Dalam Tinjauan', 'Selesai'];
 
 const statusMap: Record<string, string> = {
   in_progress: 'Sedang Berlangsung',
@@ -59,6 +59,8 @@ const statusMap: Record<string, string> = {
   review: 'Dalam Tinjauan',
   dalam_tinjauan: 'Dalam Tinjauan',
   'dalam tinjauan': 'Dalam Tinjauan',
+  ditugaskan: 'Ditugaskan',
+  assigned: 'Ditugaskan',
   selesai: 'Selesai',
   completed: 'Selesai',
   done: 'Selesai',
@@ -381,3 +383,4 @@ export const getSurveyQuestions = async () => {
 
 export const getDocumentFileUrl = (documentId: string | number) =>
   `${api.defaults.baseURL}/dokumen/${documentId}/file`;
+

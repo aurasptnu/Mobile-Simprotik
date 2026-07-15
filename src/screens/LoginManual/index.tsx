@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 
 import {
-  ActivityIndicator,
   Image,
   ScrollView,
   Text,
@@ -15,7 +14,6 @@ import {useNavigation} from '@react-navigation/native';
 import {loginManualUser} from '../../services/mobile';
 import {saveStaffUUID, saveUser} from '../../storage/auth';
 import {styles} from './styles';
-import {colors} from '../../theme';
 
 const arrowIcon = require('../../assets/images/panah.png');
 
