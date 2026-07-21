@@ -1,6 +1,5 @@
-// Base API URL — ganti ini jika backend mengirim URL ngrok baru.
-// Setelah hosting, ganti ke domain production.
-export const API_BASE_URL = 'https://scooter-coerce-reunite.ngrok-free.dev/api';
+// Base API URL production domain untuk backend SIMPROTIK.
+export const API_BASE_URL = 'https://tugas.tik.unila.ac.id/api';
 export const BACKEND_BASE_URL = API_BASE_URL.replace(/\/api\/?$/, '');
 export const SSO_LOGIN_URL = `${API_BASE_URL}/auth/sso`;
 export const SSO_CALLBACK_PATH = '/auth/sso/callback';
