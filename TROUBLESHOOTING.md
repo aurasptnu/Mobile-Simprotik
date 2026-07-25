@@ -1,231 +1,128 @@
-# 🔧 Troubleshooting Backend API Connection
+# Troubleshooting Koneksi API Mobile SIMPROTIK
 
-## Status: Login Gagal / Tidak Bisa Ambil Data
+Dokumen ini dipakai untuk mengecek koneksi aplikasi mobile ke backend SIMPROTIK. Mobile harus mengambil data dari backend yang sama dengan website, bukan dari data dummy lokal.
 
-Jika Anda mendapatkan error saat login seperti "Gagal mendapatkan UUID dari server", berikut adalah langkah-langkah untuk debug:
+## Base URL Aktif
 
----
+File konfigurasi:
 
-## ✅ Step 1: Test API Connection
-
-1. **Buka Login Screen** di aplikasi
-2. **Tap tombol "Test API Connection"** (tombol abu-abu di bawah Login)
-3. Lihat pesan error yang muncul
-
-### Possible Error Messages:
-
-#### Error: "Backend API is not reachable"
-**Kemungkinan Penyebab:**
-- Backend API belum running
-- ngrok tunnel sudah expired
-- Network tidak bisa akses backend
-
-**Solusi:**
-- Pastikan backend sudah berjalan (npm start / python manage.py runserver)
-- Jika pakai ngrok, tunnel mungkin expired → buat tunnel baru
-- Check URL di `src/config/api.ts`
-
-#### Error: "Network Error" atau timeout
-**Kemungkinan Penyebab:**
-- CORS issue
-- Firewall blocking
-- Server crash
-
-**Solusi:**
-```bash
-# Check backend logs
-# Pastikan CORS headers ada di response:
-# Access-Control-Allow-Origin: *
+```text
+src/config/api.ts
 ```
 
----
-
-## ✅ Step 2: Check API Configuration
-
-**File:** `src/config/api.ts`
+Nilai yang harus dipakai:
 
 ```typescript
-export const API_BASE_URL = 'https://scooter-coerce-reunite.ngrok-free.dev/api';
+export const API_BASE_URL = 'https://tugas.tik.unila.ac.id/api';
 ```
 
-**Pastikan:**
-- ✅ URL benar dan accessible
-- ✅ Jika pakai ngrok: tunnel masih aktif
-- ✅ Backend service running di port yang benar
+Jika muncul `Network Error`, cek dulu apakah URL tersebut bisa diakses dari browser/emulator.
 
----
+## Akun Demo Dokumentasi
 
-## ✅ Step 3: Verify Backend Endpoints
+Semua akun memakai password:
 
-Backend harus memiliki endpoint-endpoint ini:
-
-### 1. Get Staff UUID
-```bash
-GET /api/master/pengguna/staf?search=198610032025212042
-
-Response:
-{
-  "uuid": "550e8400-e29b-41d4-a716-446655440000"
-}
+```text
+simprotik123
 ```
 
-**Test dengan cURL:**
-```bash
-curl -X GET "http://localhost:8000/api/master/pengguna/staf?search=198610032025212042"
+| Peran | Username/NIP | Nama | Divisi |
+|---|---|---|---|
+| Operator | `2215061089` | Harry Bonardo Situmorang | UPA TIK (Pusat) |
+| Kepala Divisi | `2215061013` | Annisa Ramaadhanti | Sumber Daya Sistem Informasi |
+| Staf | `2215061100` | Aura | Sumber Daya Sistem Informasi |
+
+## Endpoint Yang Perlu Dicek
+
+### Login manual
+
+```http
+POST https://tugas.tik.unila.ac.id/api/login
 ```
-
-### 2. Get Tasks
-```bash
-GET /api/mobile/tugas?id_staf=550e8400-e29b-41d4-a716-446655440000
-
-Response:
-[
-  {
-    "id": "...",
-    "title": "...",
-    "status": "..."
-  }
-]
-```
-
-### 3. Get Active Projects
-```bash
-GET /api/mobile/proyek-aktif?id_pengguna=550e8400-e29b-41d4-a716-446655440000
-```
-
-### 4. Get Task Detail
-```bash
-GET /api/mobile/pekerjaan/{id}?id_pengguna=550e8400-e29b-41d4-a716-446655440000
-```
-
-### 5. Upload Documentation
-```bash
-POST /api/mobile/pekerjaan/{id}/dokumentasi-akhir
-Content-Type: multipart/form-data
-
-Form data:
-- id_pengguna: string
-- dokumentasi_akhir: file
-```
-
-### 6. Submit Survey
-```bash
-POST /api/mobile/pekerjaan/{id}/survei
-Content-Type: application/json
 
 Body:
+
+```json
 {
-  "id_pengguna": "...",
-  "nama_klien": "...",
-  "nip_klien": "...",
-  "jawaban1": "...",
-  "jawaban2": "...",
-  "jawaban3": "...",
-  "jawaban4": "...",
-  "jawaban5": "...",
-  "jawaban6": "..."
+  "nip": "2215061100",
+  "password": "simprotik123"
 }
 ```
 
----
+Jika berhasil, simpan `data.uuid` sebagai `id_pengguna` untuk request mobile.
 
-## ✅ Step 4: Check Console Logs
+### List pekerjaan aktif mobile
 
-**Buka React Native Debugger atau Expo logs:**
-
-```bash
-# Jika pakai Expo
-expo start
-
-# Lihat console output untuk logs seperti:
-[UUID] Attempting to fetch UUID from backend for: yeni.farida@upatik.com
-[UUID] API Base URL: https://...
-[UUID] Successfully got UUID from backend: 550e8400-...
+```http
+GET https://tugas.tik.unila.ac.id/api/mobile/pekerjaan-aktif?id_pengguna={uuid_staf}
 ```
 
-**Debug messages:**
-- `[UUID]` - UUID fetching process
-- `[LOGIN]` - Login process
-- `[TEST]` - API connection test
-- `[ERROR]` - Error details
+### List proyek aktif mobile
 
----
-
-## ✅ Step 5: Use Fallback Mode (Development)
-
-Jika backend belum ready, app sudah support **fallback mechanism**:
-
-File: `src/services/auth.ts`
-
-```typescript
-// Development mode: Set to true untuk mock UUID jika backend tidak available
-const USE_MOCK_UUID_ON_ERROR = true;
+```http
+GET https://tugas.tik.unila.ac.id/api/mobile/proyek-aktif?id_pengguna={uuid_staf}
 ```
 
-Jika `USE_MOCK_UUID_ON_ERROR = true`:
-- ✅ Login dengan dummy account tetap berhasil
-- ✅ UUID di-generate otomatis (mock UUID)
-- ✅ App akan fallback ke local data jika backend error
+### Detail pekerjaan mobile
 
-**Untuk production:** Set ke `false` agar wajib connect ke backend.
-
----
-
-## ✅ Step 6: Test with Demo Accounts
-
-**Semua akun pakai password: `123456`**
-
-| NIP | Name |
-|-------|------|
-| yeni.farida@upatik.com | Yeni Farida, A.M. |
-| wahozin@upatik.com | Wahozin |
-| rahmadona@upatik.com | Rahmadona |
-| supriyanto@upatik.com | Supriyanto |
-| nokimala@upatik.com | Nokimala |
-| ... | ... (19 more) |
-
-Lihat lengkap di: `src/data/users.ts`
-
----
-
-## 🔍 Quick Diagnostic
-
-Run this in your React Native app console:
-
-```javascript
-import { testBackendConnection } from './src/services/auth';
-import { debugConfig, logDebugInfo } from './src/utils/debug';
-
-// Print all config
-logDebugInfo();
-
-// Test connection
-testBackendConnection().then(result => {
-  console.log('Connection Result:', result);
-});
+```http
+GET https://tugas.tik.unila.ac.id/api/mobile/pekerjaan/{id_pekerjaan}?id_pengguna={uuid_staf}
 ```
 
----
+### Detail proyek mobile
 
-## 📋 Checklist Sebelum Go Live
+```http
+GET https://tugas.tik.unila.ac.id/api/mobile/proyek/{id_proyek}?id_pengguna={uuid_staf}
+```
 
-- [ ] Backend API running dan accessible
-- [ ] Endpoint `/api/mobile/staff-uuid` implemented dan return UUID
-- [ ] Semua staff sudah ada di database backend dengan UUID
-- [ ] CORS enabled di backend
-- [ ] `USE_MOCK_UUID_ON_ERROR` set ke `false`
-- [ ] API_BASE_URL di `src/config/api.ts` sudah production URL
-- [ ] Test dengan semua 24 demo accounts
-- [ ] Verify data dari backend ditampilkan dengan benar
+### Upload dokumentasi akhir
 
----
+```http
+POST https://tugas.tik.unila.ac.id/api/mobile/pekerjaan/{id_pekerjaan}/dokumentasi-akhir
+```
 
-## 🆘 Still Not Working?
+Body `form-data`:
 
-1. **Check Backend Logs** - lihat error detail di server
-2. **Test Endpoint Manually** - gunakan Postman atau cURL
-3. **Enable Debug Logging** - check React Native console
-4. **Check Network** - pastikan firewall/VPN tidak block API
-5. **Verify Credentials** - pastikan NIP/UUID benar di database
+```text
+id_pengguna = {uuid_staf}
+dokumentasi_akhir = pilih file
+```
 
-Butuh bantuan? Check logs untuk error details yang spesifik!
+### Kirim survei
+
+```http
+POST https://tugas.tik.unila.ac.id/api/mobile/pekerjaan/{id_pekerjaan}/survei
+```
+
+Body:
+
+```json
+{
+  "id_pengguna": "{uuid_staf}",
+  "nama_klien": "Nama Klien Demo",
+  "nip_klien": "198000000000000000",
+  "jawaban1": 5,
+  "jawaban2": 5,
+  "jawaban3": 4,
+  "jawaban4": 5,
+  "jawaban5": 5,
+  "jawaban6": "Layanan sudah baik."
+}
+```
+
+## Penyebab Umum Network Error
+
+1. Backend/domain tidak bisa diakses dari perangkat atau emulator.
+2. VPN/jaringan kampus belum aktif jika akses masih dibatasi jaringan internal.
+3. SSL/domain bermasalah.
+4. Aplikasi masih memakai build lama yang belum berisi `API_BASE_URL` terbaru.
+5. Backend belum memiliki data user aktif atau user belum punya tugas aktif.
+
+## Checklist Sebelum Demo
+
+- [ ] `API_BASE_URL` sudah `https://tugas.tik.unila.ac.id/api`.
+- [ ] Tidak ada sisa URL ngrok di source aktif.
+- [ ] Akun Aura berhasil login manual.
+- [ ] Response login mengembalikan `uuid`, `peran`, `status_akun`, dan `divisi`.
+- [ ] Endpoint mobile mengembalikan data dari backend.
+- [ ] Aplikasi sudah di-rebuild setelah konfigurasi diganti.

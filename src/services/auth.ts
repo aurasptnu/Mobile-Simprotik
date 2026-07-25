@@ -1,51 +1,33 @@
-import { users } from '../data/users';
 import api from './api';
 import { API_BASE_URL } from '../config/api';
-
-// Development mode: Set to true untuk mock UUID jika backend tidak available
-const USE_MOCK_UUID_ON_ERROR = true;
 
 export async function loginUser(
   nip: string,
   password: string,
 ) {
-  const trimmedNip = nip.trim();
-  const trimmedPassword = password.trim();
+  const response = await api.post('/login', {
+    nip: nip.trim(),
+    password: password.trim(),
+  });
 
-  const matchedUser = users.find(
-    user =>
-      String(user.nip).trim() === trimmedNip &&
-      String(user.password).trim() === trimmedPassword,
-  );
+  const user = response.data?.data;
 
-  if (!matchedUser) {
-    return null;
+  if (!user?.uuid) {
+    throw new Error('Data pengguna dari backend tidak lengkap.');
   }
 
-  // Return a copy to avoid accidental mutation of shared dummy data.
-  return { ...matchedUser };
+  return {
+    id: user.uuid,
+    uuid: user.uuid,
+    name: user.nama_lengkap,
+    password: '',
+    role: String(user.peran || '').toLowerCase() === 'staf' ? 'staff' : String(user.peran || '').toLowerCase(),
+    division: user.divisi?.nama_divisi || '-',
+    nip: user.NIP || user.username_sso || nip.trim(),
+    raw: user,
+  };
 }
 
-/**
- * Generate mock UUID dari NIP (untuk testing tanpa backend)
- */
-function generateMockUUID(nip: string): string {
-  // Generate deterministic UUID dari NIP sehingga sama login berulang kali
-  let hash = 0;
-  for (let i = 0; i < nip.length; i++) {
-    const char = nip.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash;
-  }
-
-  const hex = Math.abs(hash).toString(16).padStart(8, '0');
-  return `mock-${hex}-0000-0000-000000000000`;
-}
-
-/**
- * Get valid staff UUID from backend using NIP
- * This verifies the user exists in backend database and returns their UUID
- */
 export async function getStaffUUIDFromBackend(nip: string): Promise<string | null> {
   const trimmedNip = nip.trim();
 
@@ -54,23 +36,18 @@ export async function getStaffUUIDFromBackend(nip: string): Promise<string | nul
     console.log(`[UUID] API Base URL: ${API_BASE_URL}`);
 
     const response = await api.get('/master/pengguna/staf', {
+      params: {search: trimmedNip},
       timeout: 5000,
     });
 
-    console.log(`[UUID] Backend response:`, response.data);
-
     const staff = Array.isArray(response.data?.data) ? response.data.data : [];
     const matchedStaff = staff.find(
-      (item: any) => String(item.NIP || item.nip || '').trim() === trimmedNip,
+      (item: any) =>
+        String(item.NIP || item.nip || '').trim() === trimmedNip ||
+        String(item.username_sso || '').trim() === trimmedNip,
     );
 
-    if (matchedStaff?.uuid) {
-      console.log(`[UUID] Successfully got UUID from backend:`, matchedStaff.uuid);
-      return matchedStaff.uuid;
-    }
-
-    console.log('[UUID] Staff NIP not found in backend demo users');
-    return null;
+    return matchedStaff?.uuid || null;
   } catch (error: any) {
     console.error('[UUID] Error getting staff UUID from backend:', {
       message: error.message,
@@ -79,21 +56,10 @@ export async function getStaffUUIDFromBackend(nip: string): Promise<string | nul
       data: error.response?.data,
     });
 
-    // Fallback: Generate mock UUID jika backend tidak available
-    if (USE_MOCK_UUID_ON_ERROR) {
-      console.warn('[UUID] Using mock UUID for development/testing');
-      const mockUUID = generateMockUUID(trimmedNip);
-      console.log(`[UUID] Generated mock UUID: ${mockUUID}`);
-      return mockUUID;
-    }
-
     return null;
   }
 }
 
-/**
- * Test connection ke backend API
- */
 export async function testBackendConnection(): Promise<{
   success: boolean;
   message: string;
