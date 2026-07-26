@@ -1,4 +1,5 @@
 import api from './api';
+import { saveAuthToken } from '../storage/auth';
 
 export type MobileTaskKind = 'pekerjaan' | 'proyek';
 
@@ -268,6 +269,10 @@ export const loginManualUser = async (nip: string, password: string) => {
     throw new Error('Aplikasi mobile hanya tersedia untuk pengguna dengan role Staf.');
   }
 
+  if (response.data?.token) {
+    await saveAuthToken(response.data.token);
+  }
+
   return normalizeStaffUser(user);
 };
 
@@ -285,6 +290,10 @@ export const loginWithSSOToken = async (token: string) => {
 
   if (String((user as any).status_akun || 'aktif').toLowerCase() !== 'aktif') {
     throw new Error('Akun SSO sudah tercatat dan menunggu aktivasi Admin Akses.');
+  }
+
+  if (response.data?.token) {
+    await saveAuthToken(response.data.token);
   }
 
   return normalizeStaffUser(user);
@@ -383,4 +392,3 @@ export const getSurveyQuestions = async () => {
 
 export const getDocumentFileUrl = (documentId: string | number) =>
   `${api.defaults.baseURL}/dokumen/${documentId}/file`;
-

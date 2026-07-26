@@ -1,5 +1,6 @@
 import api from './api';
 import { API_BASE_URL } from '../config/api';
+import { saveAuthToken } from '../storage/auth';
 
 export async function loginUser(
   nip: string,
@@ -14,6 +15,10 @@ export async function loginUser(
 
   if (!user?.uuid) {
     throw new Error('Data pengguna dari backend tidak lengkap.');
+  }
+
+  if (response.data?.token) {
+    await saveAuthToken(response.data.token);
   }
 
   return {
