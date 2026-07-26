@@ -299,10 +299,8 @@ export const loginWithSSOToken = async (token: string) => {
   return normalizeStaffUser(user);
 };
 
-export const getDashboard = async (staffUuid: string) => {
-  const response = await api.get('/dashboard/staf', {
-    params: {id_pengguna: staffUuid},
-  });
+export const getDashboard = async (_staffUuid: string) => {
+  const response = await api.get('/dashboard/staf');
 
   return response.data;
 };
