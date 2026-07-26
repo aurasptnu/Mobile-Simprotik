@@ -16,7 +16,6 @@ import {
   useRoute,
 } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getStaffUUID } from '../../storage/auth';
 
 import { addSurveyResponse } from '../../data/survey';
 import { surveyQuestions } from '../../data/surveyQuestions';
@@ -103,14 +102,7 @@ export default function SurveyScreen() {
       let backendSurvey: any = null;
 
       if (task) {
-        const staffUUID = await getStaffUUID();
-        
-        if (!staffUUID) {
-          throw new Error('Akun staf demo belum dipilih.');
-        }
-
         const payload = {
-          id_pengguna: staffUUID,
           nama_klien: nama,
           nip_klien: nip,
           jawaban1: Number(answers[choiceQuestions[0].id]),
