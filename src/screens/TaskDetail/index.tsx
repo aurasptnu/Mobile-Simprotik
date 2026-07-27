@@ -18,8 +18,6 @@ import {
 } from '@react-navigation/native';
 
 import {launchImageLibrary} from 'react-native-image-picker';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
 import {styles} from './styles';
 import {colors} from '../../theme';
 import {getStaffUUID} from '../../storage/auth';
@@ -61,7 +59,6 @@ export default function TaskDetailScreen() {
   const [loadingDetail, setLoadingDetail] = useState(true);
   const [uploading, setUploading] = useState(false);
 
-  const storageKey = `${task.kind}_${task.rawId || task.id}`;
 
   const loadDetail = React.useCallback(async () => {
     setLoadingDetail(true);
@@ -83,32 +80,11 @@ export default function TaskDetailScreen() {
       setSurveyCompleted(remoteDetail.surveyCompleted);
       setSurveyResult(remoteDetail.surveyAnswers || null);
     } catch (error) {
-      console.log('loadDetail error, falling back to local storage', error);
+      console.log('loadDetail error', error);
     } finally {
-      try {
-        const savedDoc = await AsyncStorage.getItem(`task_doc_${storageKey}`);
-        const savedSurvey = await AsyncStorage.getItem(`task_survey_${storageKey}`);
-        const savedSurveyDetail = await AsyncStorage.getItem(`task_survey_detail_${storageKey}`);
-
-        if (savedDoc) {
-          setPhoto(savedDoc);
-          setDokumenExists(true);
-        }
-
-        if (savedSurvey === 'true') {
-          setSurveyCompleted(true);
-        }
-
-        if (savedSurveyDetail) {
-          setSurveyResult(JSON.parse(savedSurveyDetail));
-        }
-      } catch (error) {
-        console.log('fallback load error', error);
-      }
-
       setLoadingDetail(false);
     }
-  }, [storageKey, task]);
+  }, [task]);
 
   useEffect(() => {
     loadDetail();
@@ -175,7 +151,6 @@ export default function TaskDetailScreen() {
         uploadedDokumen?.url || uploadedDokumen?.file_path || 
         null);
       setPhoto(uri);
-
       await AsyncStorage.setItem(`task_doc_${storageKey}`, uri);
     } catch (error) {
 
@@ -191,17 +166,12 @@ export default function TaskDetailScreen() {
     }
   };
 
-  const saveSurveyStatus = async (status: boolean, result?: any) => {
-    try {
-      await AsyncStorage.setItem(`task_survey_${storageKey}`, String(status));
-      if (result) {
-        await AsyncStorage.setItem(`task_survey_detail_${storageKey}`, JSON.stringify(result));
-        setSurveyResult(result);
-      }
-      setSurveyCompleted(status);
-    } catch (error) {
-      console.log('Error saving survey:', error);
+  const saveSurveyStatus = (status: boolean, result?: any) => {
+    if (result) {
+      setSurveyResult(result);
     }
+
+    setSurveyCompleted(status);
   };
 
   const handleSurvey = () => {

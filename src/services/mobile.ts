@@ -1,4 +1,5 @@
 import api from './api';
+import { saveAuthToken } from '../storage/auth';
 
 export type MobileTaskKind = 'pekerjaan' | 'proyek';
 
@@ -268,6 +269,10 @@ export const loginManualUser = async (nip: string, password: string) => {
     throw new Error('Aplikasi mobile hanya tersedia untuk pengguna dengan role Staf.');
   }
 
+  if (response.data?.token) {
+    await saveAuthToken(response.data.token);
+  }
+
   return normalizeStaffUser(user);
 };
 
@@ -287,25 +292,29 @@ export const loginWithSSOToken = async (token: string) => {
     throw new Error('Akun SSO sudah tercatat dan menunggu aktivasi Admin Akses.');
   }
 
+  if (response.data?.token) {
+    await saveAuthToken(response.data.token);
+  }
+
   return normalizeStaffUser(user);
 };
 
-export const getDashboard = async (staffUuid: string) => {
-  const response = await api.get('/dashboard/staf', {
-    params: {id_pengguna: staffUuid},
-  });
+export const getDashboard = async (_staffUuid: string) => {
+  const response = await api.get('/dashboard/staf');
 
   return response.data;
 };
 
+const userParam = (staffUuid: string) => ({
+  params: {
+    id_pengguna: staffUuid,
+  },
+});
+
 export const getActiveMobileTasks = async (staffUuid: string) => {
   const [pekerjaanRes, proyekRes] = await Promise.all([
-    api.get('/mobile/pekerjaan-aktif', {
-      params: {id_pengguna: staffUuid},
-    }),
-    api.get('/mobile/proyek-aktif', {
-      params: {id_pengguna: staffUuid},
-    }),
+    api.get('/mobile/pekerjaan-aktif', userParam(staffUuid)),
+    api.get('/mobile/proyek-aktif', userParam(staffUuid)),
   ]);
 
   return [
@@ -315,13 +324,10 @@ export const getActiveMobileTasks = async (staffUuid: string) => {
 };
 
 export const getMobileTaskDetail = async (task: Pick<MobileTask, 'rawId' | 'kind'>, staffUuid: string) => {
-  const response = await api.get(`/mobile/${task.kind}/${task.rawId}`, {
-    params: {id_pengguna: staffUuid},
-  });
+  const response = await api.get(`/mobile/${task.kind}/${task.rawId}`, userParam(staffUuid));
 
   return normalizeTask(response.data, task.kind);
 };
-
 export const uploadFinalDocumentation = async (
   task: Pick<MobileTask, 'rawId' | 'kind'>,
   staffUuid: string,
@@ -383,4 +389,3 @@ export const getSurveyQuestions = async () => {
 
 export const getDocumentFileUrl = (documentId: string | number) =>
   `${api.defaults.baseURL}/dokumen/${documentId}/file`;
-

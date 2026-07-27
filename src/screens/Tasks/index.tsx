@@ -27,7 +27,6 @@ import {
 } from '../../storage/auth';
 
 import {
-  tasks,
   fetchTasks,
 } from '../../data/tasks';
 
@@ -105,7 +104,7 @@ export default function TasksScreen() {
           return;
         }
 
-        // Try fetching from backend first; fallback to local mock tasks
+        // Ambil tugas langsung dari backend.
         let myTasks: any[] = [];
 
         try {
@@ -117,21 +116,7 @@ export default function TasksScreen() {
             myTasks = (remote as any).data;
           }
         } catch (e) {
-          console.log('remote fetch failed, using local tasks', e);
-        }
-
-        // If remote didn't provide tasks, filter local mock tasks
-        if (!myTasks || myTasks.length === 0) {
-          const userNip = String(user.nip || '').trim();
-
-          myTasks = tasks.filter(task => {
-            const assigned = task.assignedTo;
-            const isAssigned = Array.isArray(assigned)
-              ? assigned.map((a: any) => String(a).trim()).includes(userNip)
-              : String(assigned).trim() === userNip;
-
-            return isAssigned && task.isStarted === true;
-          });
+          console.log('remote fetch failed', e);
         }
 
         console.log(

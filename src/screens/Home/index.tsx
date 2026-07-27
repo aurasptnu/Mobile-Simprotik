@@ -20,7 +20,6 @@ import {
 } from '../../storage/auth';
 
 import {
-  tasks,
   fetchTasks,
 } from '../../data/tasks';
 import { getDashboard } from '../../services/mobile';
@@ -91,23 +90,7 @@ export default function HomeScreen() {
         console.log('fetchTasks failed:', e);
       }
 
-      let combined = remoteTasks || [];
-
-      if (!combined || combined.length === 0) {
-        // fallback ke local mock jika backend kosong
-        const userNip = String(loggedUser.nip || '').trim();
-
-        combined = tasks.filter(task => {
-          const assigned = task.assignedTo;
-          const isAssigned = Array.isArray(assigned)
-            ? assigned.map(a => String(a).trim()).includes(userNip)
-            : String(assigned).trim() === userNip;
-
-          return isAssigned && task.isStarted;
-        });
-      }
-
-      setUserTasks(combined);
+      setUserTasks(remoteTasks || []);
     };
 
   // Statistik
