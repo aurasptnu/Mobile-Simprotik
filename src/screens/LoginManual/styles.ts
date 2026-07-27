@@ -36,6 +36,11 @@ export const styles = StyleSheet.create({
     lineHeight: 22,
   },
 
+  inputWrapper: {
+    position: 'relative',
+    marginBottom: 12,
+  },
+
   input: {
     borderWidth: 1,
     borderColor: colors.border,
@@ -43,7 +48,28 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 18,
     paddingVertical: 14,
     backgroundColor: colors.surfaceAlt,
-    marginBottom: 12,
+    color: colors.text,
+    fontSize: font.size.md,
+  },
+
+  passwordInput: {
+    paddingRight: 56,
+  },
+
+  passwordToggle: {
+    position: 'absolute',
+    right: 14,
+    top: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 36,
+  },
+
+  passwordIcon: {
+    width: 22,
+    height: 22,
+    resizeMode: 'contain',
   },
 
   manualButton: {

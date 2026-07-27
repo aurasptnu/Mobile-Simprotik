@@ -4,6 +4,7 @@ import React, {
 } from 'react';
 
 import {
+  ScrollView,
   View,
   Text,
   TouchableOpacity,
@@ -61,7 +62,7 @@ export default function ProfileScreen() {
     : 'Peran: Staf';
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.screen} contentContainerStyle={styles.container}>
       <Text style={styles.screenTitle}>Profil Saya</Text>
 
       <View style={styles.profileCard}>
@@ -71,9 +72,12 @@ export default function ProfileScreen() {
           </Text>
         </View>
 
-        <Text style={styles.name}>{user?.name}</Text>
-        <Text style={styles.role}>{roleLabel}</Text>
-        <Text style={styles.identity}>{user?.nip}</Text>
+        <Text style={styles.name}>
+          {user?.name}</Text>
+        <Text style={styles.role}>
+          {roleLabel}</Text>
+        <Text style={styles.identity}>
+          {user?.nip}</Text>
       </View>
 
       <View style={styles.detailCard}>
@@ -97,6 +101,6 @@ export default function ProfileScreen() {
       >
         <Text style={styles.logoutText}>Logout</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 }

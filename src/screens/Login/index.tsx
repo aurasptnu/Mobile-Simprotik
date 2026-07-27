@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {
   Image,
@@ -20,6 +20,29 @@ const arrowIcon = require('../../assets/images/panah.png');
 export default function LoginScreen() {
   const navigation = useNavigation<any>();
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    const handleIncomingUrl = async (url?: string | null) => {
+      if (!url) return;
+
+      console.log('LOGIN SCREEN URL:', url);
+
+      const parsed = url.match(/[?&](token|code)=[^&]+/);
+      if (!parsed) return;
+
+      const paramName = parsed[1];
+      const token = new URL(url).searchParams.get(paramName) || '';
+
+      if (!token) return;
+
+      console.log('SSO token received:', token);
+    };
+
+    Linking.getInitialURL().then(handleIncomingUrl);
+    const subscription = Linking.addEventListener('url', ({url}) => handleIncomingUrl(url));
+
+    return () => subscription?.remove();
+  }, []);
 
   const handleSSOLogin = async () => {
     setError('');

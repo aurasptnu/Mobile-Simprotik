@@ -5,13 +5,19 @@ import {colors, font, radius, shadow} from '../../theme';
 
 export const styles =
   StyleSheet.create({
-    container: {
+    screen: {
       flex: 1,
+      backgroundColor: colors.surfaceAlt,
+    },
+
+    container: {
+      flexGrow: 1,
       backgroundColor:
         colors.surfaceAlt,
       alignItems:
         'center',
       padding: 24,
+      paddingBottom: 130,
     },
 
     avatar: {
@@ -36,6 +42,7 @@ export const styles =
       fontWeight: font.weight.extrabold,
       marginTop: 20,
       color: colors.text,
+      textAlign: 'center',
     },
 
     identity: {

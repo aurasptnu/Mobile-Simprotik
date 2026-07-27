@@ -1,3 +1,11 @@
+import {Dimensions, PixelRatio} from 'react-native';
+
+const {width: SCREEN_WIDTH} = Dimensions.get('window');
+const guidelineBaseWidth = 375;
+
+const normalizeFont = (size: number) =>
+  PixelRatio.roundToNearestPixel(size * (SCREEN_WIDTH / guidelineBaseWidth));
+
 export const colors = {
   background: '#FFFFFF',
   surfaceAlt: '#F7F9FC',
@@ -55,17 +63,17 @@ export const font = {
   family: 'PlusJakartaSans',
   fallback: 'System',
   size: {
-    xs: 11,
-    sm: 12,
-    base: 14,
-    md: 15,
-    lg: 16,
-    cardTitle: 18,
-    xl: 20,
-    modalTitle: 22,
-    xxl: 24,
-    display: 28,
-    avatar: 40,
+    xs: normalizeFont(11),
+    sm: normalizeFont(12),
+    base: normalizeFont(14),
+    md: normalizeFont(15),
+    lg: normalizeFont(16),
+    cardTitle: normalizeFont(18),
+    xl: normalizeFont(20),
+    modalTitle: normalizeFont(22),
+    xxl: normalizeFont(24),
+    display: normalizeFont(28),
+    avatar: normalizeFont(40),
   },
   lineHeight: {
     base: 22,

@@ -95,7 +95,9 @@ export default function SurveyScreen() {
     const missing = choiceQuestions.find(q => !answers[q.id]);
     if (missing) {
       setSubmitting(false);
-      Alert.alert('Perhatian', 'Harap jawab semua pertanyaan survey terlebih dahulu.');
+      Alert.alert(
+        'Perhatian', 
+        'Harap jawab semua pertanyaan survey terlebih dahulu.');
       return;
     }
 
@@ -121,9 +123,18 @@ export default function SurveyScreen() {
           jawaban6: comment || '',
         };
 
-        const response = await submitTaskSurvey(task, payload);
-        backendSurvey = response?.data || response || null;
-        await AsyncStorage.setItem(`task_survey_${task.kind}_${task.rawId || task.id}`, 'true');
+        const response = 
+        await submitTaskSurvey(
+          task, 
+          payload
+        );
+        backendSurvey = 
+        response?.data || 
+        response || null;
+
+        await AsyncStorage.setItem(
+          `task_survey_${task.kind}_${task.rawId || task.id}`, 
+          'true');
       }
 
       const newSurvey = {
@@ -147,7 +158,9 @@ export default function SurveyScreen() {
       setNama('');
       setNip('');
       setSubmitting(false);
-      Alert.alert('Berhasil', 'Survey berhasil disubmit', [
+      
+      Alert.alert('Berhasil', 
+        'Survey berhasil disubmit', [
         {
           text: 'OK',
           onPress: () => navigation.goBack(),
@@ -158,7 +171,8 @@ export default function SurveyScreen() {
       setSubmitting(false);
       Alert.alert(
         'Survey Gagal',
-        getApiErrorMessage(err, 'Survey belum berhasil dikirim ke backend.'),
+        getApiErrorMessage(err, 
+          'Survey belum berhasil dikirim ke backend.'),
       );
     }
   };

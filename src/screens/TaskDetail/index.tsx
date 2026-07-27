@@ -76,6 +76,7 @@ export default function TaskDetailScreen() {
 
       const remoteDetail = await getMobileTaskDetail(task, staffUUID);
       setDetail(remoteDetail);
+      
       setDokumenExists(remoteDetail.hasDocument);
       setDokumenId(remoteDetail.documentId || null);
       setDokumenUrl(remoteDetail.documentUrl || null);
@@ -162,20 +163,29 @@ export default function TaskDetailScreen() {
         name: filename,
         type: asset.type || 'image/jpeg',
       });
+      
       const uploadedTinjauan = uploadRes?.data || uploadRes;
       const uploadedDokumen = uploadedTinjauan?.dokumen;
 
       setDokumenExists(true);
-      setDokumenId(uploadedTinjauan?.id_dokumen || uploadedDokumen?.id_dokumen || null);
-      setDokumenUrl(uploadedDokumen?.file || uploadedDokumen?.url || uploadedDokumen?.file_path || null);
+      setDokumenId(uploadedTinjauan?.id_dokumen || 
+        uploadedDokumen?.id_dokumen || 
+        null);
+      setDokumenUrl(uploadedDokumen?.file || 
+        uploadedDokumen?.url || uploadedDokumen?.file_path || 
+        null);
       setPhoto(uri);
+
       await AsyncStorage.setItem(`task_doc_${storageKey}`, uri);
     } catch (error) {
+
       console.log('upload failed', error);
       Alert.alert(
         'Upload Gagal',
-        getApiErrorMessage(error, 'Dokumentasi akhir belum berhasil diupload ke backend.'),
+        getApiErrorMessage(error, 
+          'Dokumentasi akhir belum berhasil diupload ke backend.'),
       );
+
     } finally {
       setUploading(false);
     }
@@ -339,7 +349,10 @@ export default function TaskDetailScreen() {
               <Text style={styles.closeButtonText}>X</Text>
             </TouchableOpacity>
 
-            <Image source={{uri: documentUri}} style={styles.fullImage} resizeMode="contain" />
+            <Image 
+            source={{uri: documentUri}} 
+            style={styles.fullImage} 
+            resizeMode="contain" />
           </View>
         </View>
       </Modal>
