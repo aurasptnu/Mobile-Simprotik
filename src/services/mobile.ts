@@ -305,10 +305,16 @@ export const getDashboard = async (_staffUuid: string) => {
   return response.data;
 };
 
-export const getActiveMobileTasks = async (_staffUuid: string) => {
+const userParam = (staffUuid: string) => ({
+  params: {
+    id_pengguna: staffUuid,
+  },
+});
+
+export const getActiveMobileTasks = async (staffUuid: string) => {
   const [pekerjaanRes, proyekRes] = await Promise.all([
-    api.get('/mobile/pekerjaan-aktif'),
-    api.get('/mobile/proyek-aktif'),
+    api.get('/mobile/pekerjaan-aktif', userParam(staffUuid)),
+    api.get('/mobile/proyek-aktif', userParam(staffUuid)),
   ]);
 
   return [
@@ -317,17 +323,18 @@ export const getActiveMobileTasks = async (_staffUuid: string) => {
   ];
 };
 
-export const getMobileTaskDetail = async (task: Pick<MobileTask, 'rawId' | 'kind'>, _staffUuid: string) => {
-  const response = await api.get(`/mobile/${task.kind}/${task.rawId}`);
+export const getMobileTaskDetail = async (task: Pick<MobileTask, 'rawId' | 'kind'>, staffUuid: string) => {
+  const response = await api.get(`/mobile/${task.kind}/${task.rawId}`, userParam(staffUuid));
 
   return normalizeTask(response.data, task.kind);
 };
 export const uploadFinalDocumentation = async (
   task: Pick<MobileTask, 'rawId' | 'kind'>,
-  _staffUuid: string,
+  staffUuid: string,
   file: {uri: string; name: string; type: string},
 ) => {
   const form = new FormData();
+  form.append('id_pengguna', staffUuid);
   form.append('dokumentasi_akhir', file as any);
 
   const response = await api.post(`/mobile/${task.kind}/${task.rawId}/dokumentasi-akhir`, form);
@@ -338,6 +345,7 @@ export const uploadFinalDocumentation = async (
 export const submitTaskSurvey = async (
   task: Pick<MobileTask, 'rawId' | 'kind'>,
   payload: {
+    id_pengguna: string;
     nama_klien: string;
     nip_klien: string;
     jawaban1: number;
