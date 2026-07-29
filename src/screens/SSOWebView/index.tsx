@@ -78,6 +78,7 @@ export default function SSOWebViewScreen() {
       url.includes('token=')
     ) {
       processSSOCallback(url);
+      return false;
     }
     return true;
   };
