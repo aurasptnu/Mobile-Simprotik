@@ -1,18 +1,14 @@
 import React, {useState} from 'react';
-
 import {
   Image,
-  Linking,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-
 import {useNavigation} from '@react-navigation/native';
 
 import {styles} from './styles';
-import {SSO_LOGIN_URL} from '../../config/api';
 
 const profileIcon = require('../../assets/images/profile.png');
 const arrowIcon = require('../../assets/images/panah.png');
@@ -21,19 +17,15 @@ export default function LoginScreen() {
   const navigation = useNavigation<any>();
   const [error, setError] = useState('');
 
-  const handleSSOLogin = async () => {
+  const handleSSOLogin = () => {
     setError('');
-
-    try {
-      await Linking.openURL(SSO_LOGIN_URL);
-    } catch (err: any) {
-      setError(err?.message || 'Gagal membuka halaman SSO.');
-    }
+    navigation.navigate('SSOWebView');
   };
 
   const handleNavigateManual = () => {
     navigation.navigate('LoginManual');
   };
+
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
       <View style={styles.header}>
@@ -80,5 +72,3 @@ export default function LoginScreen() {
     </ScrollView>
   );
 }
-
-
