@@ -25,25 +25,87 @@ export default function SSOWebViewScreen() {
     if (handledTokenRef.current) return;
 
     try {
-      // Find token query parameter from callback URL
+      // Check for backend redirect parameters
+      const userMatch = url.match(/[?&]sso_user=([^&]+)/);
+      const pendingMatch = url.match(/[?&]sso_pending=([^&]+)/);
+      const errorMatch = url.match(/[?&]sso_error=([^&]+)/);
       const tokenMatch = url.match(/[?&]token=([^&]+)/);
-      if (!tokenMatch || !tokenMatch[1]) return;
 
-      handledTokenRef.current = true;
-      setVerifying(true);
-      setError('');
+      if (errorMatch) {
+        handledTokenRef.current = true;
+        setVerifying(false);
+        throw new Error(decodeURIComponent(errorMatch[1]));
+      }
 
-      const ssoToken = decodeURIComponent(tokenMatch[1]);
-      const matchedStaff = await loginWithSSOToken(ssoToken);
+      if (pendingMatch) {
+        handledTokenRef.current = true;
+        setVerifying(false);
+        throw new Error('Akun SSO sudah tercatat dan menunggu aktivasi Admin Akses.');
+      }
+
+      let matchedStaff: any = null;
+
+      if (userMatch && userMatch[1]) {
+        handledTokenRef.current = true;
+        setVerifying(true);
+        setError('');
+
+        // Parse base64 sso_user payload
+        let base64 = userMatch[1].replace(/-/g, '+').replace(/_/g, '/');
+        const pad = base64.length % 4;
+        if (pad) {
+          base64 += new Array(5 - pad).join('=');
+        }
+        
+        // Decode base64
+        let jsonStr = '';
+        try {
+          if (typeof atob === 'function') {
+            jsonStr = decodeURIComponent(escape(atob(base64)));
+          } else {
+            throw new Error('atob not found');
+          }
+        } catch (e) {
+          // Fallback if atob fails
+          jsonStr = '{"error": "Decode failed"}';
+        }
+
+        const payload = JSON.parse(jsonStr);
+        if (payload && payload.uuid) {
+          matchedStaff = payload;
+          if (matchedStaff.token) {
+             const { saveAuthToken } = require('../../storage/auth');
+             await saveAuthToken(matchedStaff.token);
+          }
+        }
+      } else if (tokenMatch && tokenMatch[1]) {
+        handledTokenRef.current = true;
+        setVerifying(true);
+        setError('');
+
+        const ssoToken = decodeURIComponent(tokenMatch[1]);
+        matchedStaff = await loginWithSSOToken(ssoToken);
+      } else {
+        return; // No match, do nothing
+      }
+
+      if (!matchedStaff || !matchedStaff.uuid) {
+         throw new Error('Gagal mendapatkan data pengguna dari SSO.');
+      }
+
+      const role = String(matchedStaff.peran || matchedStaff.role || '').toLowerCase();
+      if (role !== 'staf' && role !== 'staff') {
+         throw new Error('Aplikasi mobile hanya tersedia untuk pengguna dengan role Staf.');
+      }
 
       await saveUser({
         id: matchedStaff.uuid,
         uuid: matchedStaff.uuid,
-        name: matchedStaff.name,
+        name: matchedStaff.nama_lengkap || matchedStaff.name,
         role: 'staff',
-        division: matchedStaff.division,
-        nip: matchedStaff.nip,
-        raw: matchedStaff.raw,
+        division: matchedStaff.divisi?.nama_divisi || matchedStaff.division || '',
+        nip: matchedStaff.NIP || matchedStaff.nip || '',
+        raw: matchedStaff.raw || matchedStaff,
       });
       await saveStaffUUID(matchedStaff.uuid);
 
@@ -64,7 +126,10 @@ export default function SSOWebViewScreen() {
 
     if (
       url.includes('/auth/sso/callback') ||
-      url.includes('token=')
+      url.includes('token=') ||
+      url.includes('sso_user=') ||
+      url.includes('sso_pending=') ||
+      url.includes('sso_error=')
     ) {
       processSSOCallback(url);
     }
@@ -75,7 +140,10 @@ export default function SSOWebViewScreen() {
 
     if (
       url.includes('/auth/sso/callback') ||
-      url.includes('token=')
+      url.includes('token=') ||
+      url.includes('sso_user=') ||
+      url.includes('sso_pending=') ||
+      url.includes('sso_error=')
     ) {
       processSSOCallback(url);
       return false;
