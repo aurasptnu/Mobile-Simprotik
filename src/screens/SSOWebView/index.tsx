@@ -103,6 +103,8 @@ export default function SSOWebViewScreen() {
       <View style={styles.webviewContainer}>
         <WebView
           source={{uri: SSO_LOGIN_URL}}
+          originWhitelist={['*']}
+          setSupportMultipleWindows={false}
           onNavigationStateChange={handleNavigationStateChange}
           onShouldStartLoadWithRequest={handleShouldStartLoadWithRequest}
           onLoadStart={() => setLoading(true)}
