@@ -10,6 +10,7 @@ import {
 
 import LoginScreen from '../screens/Login';
 import LoginManualScreen from '../screens/LoginManual';
+import SSOWebViewScreen from '../screens/SSOWebView';
 import MainTab from './MainTab';
 
 import TaskDetailScreen from '../screens/TaskDetail';
@@ -31,6 +32,13 @@ export default function AppNavigation() {
           name="Login"
           component={
             LoginScreen
+          }
+        />
+
+        <Stack.Screen
+          name="SSOWebView"
+          component={
+            SSOWebViewScreen
           }
         />
 

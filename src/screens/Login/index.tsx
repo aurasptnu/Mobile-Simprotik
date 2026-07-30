@@ -1,18 +1,19 @@
+<<<<<<< HEAD
 import React, {useEffect, useState} from 'react';
 
+=======
+import React, {useState} from 'react';
+>>>>>>> 4fe53bb8d09296a860bb505e5067bb00f6119ed7
 import {
   Image,
-  Linking,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-
 import {useNavigation} from '@react-navigation/native';
 
 import {styles} from './styles';
-import {SSO_LOGIN_URL} from '../../config/api';
 
 const profileIcon = require('../../assets/images/profile.png');
 const arrowIcon = require('../../assets/images/panah.png');
@@ -21,6 +22,7 @@ export default function LoginScreen() {
   const navigation = useNavigation<any>();
   const [error, setError] = useState('');
 
+<<<<<<< HEAD
   useEffect(() => {
     const handleIncomingUrl = async (url?: string | null) => {
       if (!url) return;
@@ -45,18 +47,17 @@ export default function LoginScreen() {
   }, []);
 
   const handleSSOLogin = async () => {
+=======
+  const handleSSOLogin = () => {
+>>>>>>> 4fe53bb8d09296a860bb505e5067bb00f6119ed7
     setError('');
-
-    try {
-      await Linking.openURL(SSO_LOGIN_URL);
-    } catch (err: any) {
-      setError(err?.message || 'Gagal membuka halaman SSO.');
-    }
+    navigation.navigate('SSOWebView');
   };
 
   const handleNavigateManual = () => {
     navigation.navigate('LoginManual');
   };
+
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
       <View style={styles.header}>
@@ -103,5 +104,3 @@ export default function LoginScreen() {
     </ScrollView>
   );
 }
-
-
