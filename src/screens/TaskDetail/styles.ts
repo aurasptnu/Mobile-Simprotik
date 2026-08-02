@@ -196,6 +196,31 @@ export const styles = StyleSheet.create({
     borderRadius: radius.lg,
   },
 
+  emptyDocumentState: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.surfaceAlt,
+    borderRadius: radius.lg,
+    padding: 24,
+  },
+
+  emptyDocumentTitle: {
+    fontSize: font.size.xl,
+    color: colors.text,
+    fontWeight: font.weight.bold,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+
+  emptyDocumentText: {
+    fontSize: font.size.base,
+    color: colors.textSoft,
+    textAlign: 'center',
+    lineHeight: font.lineHeight.base,
+  },
+
   surveyModalContent: {
     width: '85%',
     maxHeight: '82%',

@@ -1,4 +1,5 @@
 import api from './api';
+import { BACKEND_BASE_URL } from '../config/api';
 import { saveAuthToken } from '../storage/auth';
 
 export type MobileTaskKind = 'pekerjaan' | 'proyek';
@@ -137,6 +138,36 @@ export const normalizeStatus = (value: any) => {
   return statusMap[key] || raw || '-';
 };
 
+export const normalizeDocumentUrl = (url?: string | null): string | null => {
+  if (!url) {
+    return null;
+  }
+
+  const trimmed = String(url).trim();
+
+  if (!trimmed) {
+    return null;
+  }
+
+  if (/^(https?:\/\/|content:\/\/|file:\/\/)/i.test(trimmed)) {
+    return trimmed;
+  }
+
+  if (trimmed.startsWith('/')) {
+    return `${BACKEND_BASE_URL}${trimmed}`;
+  }
+
+  if (/^(storage|uploads|dokumen)\//i.test(trimmed)) {
+    return `${BACKEND_BASE_URL}/${trimmed}`;
+  }
+
+  if (trimmed.includes('/') || trimmed.includes('.')) {
+    return `${BACKEND_BASE_URL}/${trimmed}`;
+  }
+
+  return trimmed;
+};
+
 export const isVisibleMobileStatus = (status: any) =>
   visibleStatuses.includes(normalizeStatus(status));
 
@@ -159,10 +190,12 @@ export const normalizeTask = (item: any, kind: MobileTaskKind): MobileTask => {
     ['id_dokumen', 'dokumen_id', 'id_dokumentasi_akhir'],
     document?.id_dokumen || document?.id || null,
   );
-  const documentUrl = pick(
-    source,
-    ['file_dokumentasi', 'url_dokumentasi', 'dokumen_url', 'file_url'],
-    document?.file || document?.url || document?.file_path || null,
+  const documentUrl = normalizeDocumentUrl(
+    pick(
+      source,
+      ['file_dokumentasi', 'url_dokumentasi', 'dokumen_url', 'file_url'],
+      document?.file || document?.url || document?.file_path || null,
+    ),
   );
   const assignedTo = pick<any[]>(source, ['staf', 'assignedTo', 'petugas'], []);
 
@@ -388,4 +421,4 @@ export const getSurveyQuestions = async () => {
 };
 
 export const getDocumentFileUrl = (documentId: string | number) =>
-  `${api.defaults.baseURL}/dokumen/${documentId}/file`;
+  `${BACKEND_BASE_URL}/dokumen/${documentId}/file`;

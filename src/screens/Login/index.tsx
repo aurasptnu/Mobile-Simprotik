@@ -1,11 +1,8 @@
-<<<<<<< HEAD
 import React, {useEffect, useState} from 'react';
 
-=======
-import React, {useState} from 'react';
->>>>>>> 4fe53bb8d09296a860bb505e5067bb00f6119ed7
 import {
   Image,
+  Linking,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -22,7 +19,7 @@ export default function LoginScreen() {
   const navigation = useNavigation<any>();
   const [error, setError] = useState('');
 
-<<<<<<< HEAD
+  
   useEffect(() => {
     const handleIncomingUrl = async (url?: string | null) => {
       if (!url) return;
@@ -46,10 +43,9 @@ export default function LoginScreen() {
     return () => subscription?.remove();
   }, []);
 
-  const handleSSOLogin = async () => {
-=======
+  
   const handleSSOLogin = () => {
->>>>>>> 4fe53bb8d09296a860bb505e5067bb00f6119ed7
+
     setError('');
     navigation.navigate('SSOWebView');
   };

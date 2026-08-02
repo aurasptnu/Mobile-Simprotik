@@ -24,6 +24,7 @@ import {getStaffUUID} from '../../storage/auth';
 import {
   getDocumentFileUrl,
   getMobileTaskDetail,
+  normalizeDocumentUrl,
   uploadFinalDocumentation,
 } from '../../services/mobile';
 import {surveyQuestions} from '../../data/surveyQuestions';
@@ -58,6 +59,7 @@ export default function TaskDetailScreen() {
   const [showSurveyModal, setShowSurveyModal] = useState(false);
   const [loadingDetail, setLoadingDetail] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [documentImageError, setDocumentImageError] = useState(false);
 
 
   const loadDetail = React.useCallback(async () => {
@@ -79,6 +81,7 @@ export default function TaskDetailScreen() {
       setDokumenUrl(remoteDetail.documentUrl || null);
       setSurveyCompleted(remoteDetail.surveyCompleted);
       setSurveyResult(remoteDetail.surveyAnswers || null);
+      setDocumentImageError(false);
     } catch (error) {
       console.log('loadDetail error', error);
     } finally {
@@ -151,7 +154,7 @@ export default function TaskDetailScreen() {
         uploadedDokumen?.url || uploadedDokumen?.file_path || 
         null);
       setPhoto(uri);
-      await AsyncStorage.setItem(`task_doc_${storageKey}`, uri);
+      setDocumentImageError(false);
     } catch (error) {
 
       console.log('upload failed', error);
@@ -204,7 +207,8 @@ export default function TaskDetailScreen() {
   const surveyComment = visibleSurvey?.jawaban6 ?? visibleSurvey?.comment ?? '';
   const surveyName = visibleSurvey?.nama_klien ?? visibleSurvey?.nama ?? '-';
   const surveyNip = visibleSurvey?.nip_klien ?? visibleSurvey?.nip ?? '-';
-  const documentUri = photo || dokumenUrl || (dokumenId ? getDocumentFileUrl(dokumenId) : '');
+  const resolvedDocumentUri = normalizeDocumentUrl(photo || dokumenUrl || (dokumenId ? getDocumentFileUrl(dokumenId) : ''));
+  const safeDocumentUri = typeof resolvedDocumentUri === 'string' ? resolvedDocumentUri.trim() : '';
   const canFillSurvey = surveyCompleted || dokumenExists || Boolean(photo);
   const canUploadDocument = visibleTask.status === 'Sedang Berlangsung' && !dokumenExists && !photo;
   const uploadButtonDisabled = uploading;
@@ -319,10 +323,21 @@ export default function TaskDetailScreen() {
               <Text style={styles.closeButtonText}>X</Text>
             </TouchableOpacity>
 
-            <Image 
-            source={{uri: documentUri}} 
-            style={styles.fullImage} 
-            resizeMode="contain" />
+            {safeDocumentUri && !documentImageError ? (
+              <Image
+                source={{uri: safeDocumentUri}}
+                style={styles.fullImage}
+                resizeMode="contain"
+                onError={() => setDocumentImageError(true)}
+              />
+            ) : (
+              <View style={styles.emptyDocumentState}>
+                <Text style={styles.emptyDocumentTitle}>Dokumen tidak dapat ditampilkan</Text>
+                <Text style={styles.emptyDocumentText}>
+                  Link dokumen akhir tidak tersedia atau file tidak dapat dibuka di perangkat ini.
+                </Text>
+              </View>
+            )}
           </View>
         </View>
       </Modal>
