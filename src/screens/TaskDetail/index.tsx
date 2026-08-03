@@ -20,7 +20,7 @@ import {
 import {launchImageLibrary} from 'react-native-image-picker';
 import {styles} from './styles';
 import {colors} from '../../theme';
-import {getStaffUUID} from '../../storage/auth';
+import {getStaffUUID, getAuthToken} from '../../storage/auth';
 import {
   getDocumentFileUrl,
   getMobileTaskDetail,
@@ -59,6 +59,7 @@ export default function TaskDetailScreen() {
   const [showSurveyModal, setShowSurveyModal] = useState(false);
   const [loadingDetail, setLoadingDetail] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [authToken, setAuthToken] = useState<string | null>(null);
   const [documentImageError, setDocumentImageError] = useState(false);
 
 
@@ -67,6 +68,8 @@ export default function TaskDetailScreen() {
 
     try {
       const staffUUID = await getStaffUUID();
+      const token = await getAuthToken();
+      if (token) setAuthToken(token);
 
       if (!staffUUID) {
         console.log('No staff UUID found');
@@ -325,7 +328,10 @@ export default function TaskDetailScreen() {
 
             {safeDocumentUri && !documentImageError ? (
               <Image
-                source={{uri: safeDocumentUri}}
+                source={{
+                  uri: safeDocumentUri,
+                  headers: authToken ? { Authorization: `Bearer ${authToken}` } : undefined
+                }}
                 style={styles.fullImage}
                 resizeMode="contain"
                 onError={() => setDocumentImageError(true)}
