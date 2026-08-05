@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 
 import {
   Alert,
@@ -17,14 +17,16 @@ import {
   useFocusEffect,
 } from '@react-navigation/native';
 
+import axios from 'axios';
 import {launchImageLibrary} from 'react-native-image-picker';
+import {WebView} from 'react-native-webview';
+import RNFS from 'react-native-fs';
+import api from '../../services/api';
 import {styles} from './styles';
 import {colors} from '../../theme';
 import {getStaffUUID, getAuthToken} from '../../storage/auth';
 import {
-  getDocumentFileUrl,
   getMobileTaskDetail,
-  normalizeDocumentUrl,
   uploadFinalDocumentation,
 } from '../../services/mobile';
 import {surveyQuestions} from '../../data/surveyQuestions';
@@ -43,6 +45,20 @@ const getApiErrorMessage = (error: any, fallback: string) => {
   return data?.message || error?.message || fallback;
 };
 
+const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
+  let binary = '';
+  const bytes = new Uint8Array(buffer);
+  const len = bytes.byteLength;
+  const chunkSize = 8192;
+  for (let i = 0; i < len; i += chunkSize) {
+    const chunk = bytes.subarray(i, i + chunkSize);
+    binary += String.fromCharCode.apply(null, chunk as unknown as number[]);
+  }
+  return typeof btoa !== 'undefined'
+    ? btoa(binary)
+    : Buffer.from(binary, 'binary').toString('base64');
+};
+
 export default function TaskDetailScreen() {
   const route = useRoute<any>();
   const navigation = useNavigation<any>();
@@ -59,36 +75,160 @@ export default function TaskDetailScreen() {
   const [showSurveyModal, setShowSurveyModal] = useState(false);
   const [loadingDetail, setLoadingDetail] = useState(true);
   const [uploading, setUploading] = useState(false);
-  const [authToken, setAuthToken] = useState<string | null>(null);
-  const [documentImageError, setDocumentImageError] = useState(false);
 
+  const [cachedDocumentUri, setCachedDocumentUri] = useState<string | null>(null);
+  const [downloadingDocument, setDownloadingDocument] = useState<boolean>(false);
+  const [documentLoadError, setDocumentLoadError] = useState<boolean>(false);
+
+  const isMountedRef = useRef<boolean>(true);
+  const cachedFilePathRef = useRef<string | null>(null);
+  const downloadCancelTokenRef = useRef<any>(null);
+
+  const cleanupCachedDocument = async () => {
+    if (cachedFilePathRef.current) {
+      try {
+        const pathToDelete = cachedFilePathRef.current;
+        cachedFilePathRef.current = null;
+        const exists = await RNFS.exists(pathToDelete);
+        if (exists) {
+          await RNFS.unlink(pathToDelete);
+          console.log('[DEBUG] Cleaned up cached file:', pathToDelete);
+        }
+      } catch (err) {
+        console.log('Error cleaning up cache file:', err);
+      }
+    }
+    if (isMountedRef.current) {
+      setCachedDocumentUri(null);
+    }
+  };
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+      if (downloadCancelTokenRef.current) {
+        downloadCancelTokenRef.current.cancel('Component unmounted');
+      }
+      cleanupCachedDocument();
+    };
+  }, []);
+
+  const downloadAndCacheDocument = async () => {
+    if (photo) {
+      if (isMountedRef.current) {
+        setCachedDocumentUri(photo);
+        setDownloadingDocument(false);
+        setDocumentLoadError(false);
+      }
+      return;
+    }
+
+    if (downloadCancelTokenRef.current) {
+      downloadCancelTokenRef.current.cancel('New download started');
+      downloadCancelTokenRef.current = null;
+    }
+
+    if (isMountedRef.current) {
+      setDownloadingDocument(true);
+      setDocumentLoadError(false);
+    }
+    await cleanupCachedDocument();
+
+    const cancelTokenSource = axios.CancelToken.source();
+    downloadCancelTokenRef.current = cancelTokenSource;
+
+    try {
+      let endpoint = '';
+      if (dokumenId) {
+        endpoint = `/dokumen/${dokumenId}/file`;
+      } else if (dokumenUrl) {
+        endpoint = dokumenUrl;
+      } else {
+        throw new Error('Link atau ID dokumen tidak tersedia.');
+      }
+
+      console.log('[DEBUG] Downloading document from endpoint:', endpoint);
+      const response = await api.get(endpoint, {
+        responseType: 'arraybuffer',
+        cancelToken: cancelTokenSource.token,
+      });
+
+      const contentType = (
+        response.headers?.['content-type'] ||
+        response.headers?.['Content-Type'] ||
+        ''
+      ).toLowerCase();
+
+      let ext = 'jpg';
+      if (contentType.includes('pdf') || endpoint.toLowerCase().includes('.pdf')) {
+        ext = 'pdf';
+      } else if (contentType.includes('png')) {
+        ext = 'png';
+      } else if (contentType.includes('jpeg') || contentType.includes('jpg')) {
+        ext = 'jpg';
+      }
+
+      const fileName = `temp_doc_${Date.now()}.${ext}`;
+      const filePath = `${RNFS.CachesDirectoryPath}/${fileName}`;
+
+      const base64Data = arrayBufferToBase64(response.data);
+      await RNFS.writeFile(filePath, base64Data, 'base64');
+
+      const fileUri = filePath.startsWith('file://') ? filePath : `file://${filePath}`;
+      console.log('[DEBUG] File saved to cache:', fileUri);
+
+      if (isMountedRef.current) {
+        cachedFilePathRef.current = filePath;
+        setCachedDocumentUri(fileUri);
+      }
+    } catch (error: any) {
+      if (axios.isCancel(error)) {
+        console.log('[DEBUG] Download cancelled:', error.message);
+        return;
+      }
+      console.log('[DEBUG] Document download error:', error);
+      if (isMountedRef.current) {
+        setDocumentLoadError(true);
+        Alert.alert(
+          'Gagal Memuat Dokumentasi',
+          'Gagal memuat dokumentasi. Silakan coba lagi.',
+        );
+      }
+    } finally {
+      if (isMountedRef.current) {
+        setDownloadingDocument(false);
+      }
+    }
+  };
 
   const loadDetail = React.useCallback(async () => {
     setLoadingDetail(true);
 
     try {
       const staffUUID = await getStaffUUID();
-      const token = await getAuthToken();
-      if (token) setAuthToken(token);
 
-      if (!staffUUID) {
-        console.log('No staff UUID found');
+      if (!staffUUID || !isMountedRef.current) {
         return;
       }
 
       const remoteDetail = await getMobileTaskDetail(task, staffUUID);
+      if (!isMountedRef.current) return;
+
+      console.log('[DEBUG] remoteDetail:', JSON.stringify(remoteDetail, null, 2));
       setDetail(remoteDetail);
-      
+
       setDokumenExists(remoteDetail.hasDocument);
       setDokumenId(remoteDetail.documentId || null);
       setDokumenUrl(remoteDetail.documentUrl || null);
       setSurveyCompleted(remoteDetail.surveyCompleted);
       setSurveyResult(remoteDetail.surveyAnswers || null);
-      setDocumentImageError(false);
     } catch (error) {
       console.log('loadDetail error', error);
     } finally {
-      setLoadingDetail(false);
+      if (isMountedRef.current) {
+        setLoadingDetail(false);
+      }
     }
   }, [task]);
 
@@ -102,9 +242,23 @@ export default function TaskDetailScreen() {
     }, [loadDetail]),
   );
 
+  const openDocumentModal = () => {
+    setShowPhotoModal(true);
+    downloadAndCacheDocument();
+  };
+
+  const handleClosePhotoModal = async () => {
+    if (downloadCancelTokenRef.current) {
+      downloadCancelTokenRef.current.cancel('Modal closed by user');
+      downloadCancelTokenRef.current = null;
+    }
+    setShowPhotoModal(false);
+    await cleanupCachedDocument();
+  };
+
   const handleUpload = async () => {
     if (dokumenExists || photo) {
-      setShowPhotoModal(true);
+      openDocumentModal();
       return;
     }
 
@@ -134,8 +288,7 @@ export default function TaskDetailScreen() {
     try {
       const staffUUID = await getStaffUUID();
 
-      if (!staffUUID) {
-        console.log('No staff UUID found');
+      if (!staffUUID || !isMountedRef.current) {
         return;
       }
 
@@ -145,30 +298,45 @@ export default function TaskDetailScreen() {
         name: filename,
         type: asset.type || 'image/jpeg',
       });
-      
+      console.log('[DEBUG] uploadRes:', JSON.stringify(uploadRes, null, 2));
+
+      if (!isMountedRef.current) return;
+
       const uploadedTinjauan = uploadRes?.data || uploadRes;
       const uploadedDokumen = uploadedTinjauan?.dokumen;
 
       setDokumenExists(true);
-      setDokumenId(uploadedTinjauan?.id_dokumen || 
-        uploadedDokumen?.id_dokumen || 
-        null);
-      setDokumenUrl(uploadedDokumen?.file || 
-        uploadedDokumen?.url || uploadedDokumen?.file_path || 
-        null);
-      setPhoto(uri);
-      setDocumentImageError(false);
-    } catch (error) {
-
-      console.log('upload failed', error);
-      Alert.alert(
-        'Upload Gagal',
-        getApiErrorMessage(error, 
-          'Dokumentasi akhir belum berhasil diupload ke backend.'),
+      setDokumenId(
+        uploadedTinjauan?.id_dokumen ||
+          uploadedDokumen?.id_dokumen ||
+          null,
       );
-
+      setDokumenUrl(
+        uploadedDokumen?.file ||
+          uploadedDokumen?.url ||
+          uploadedDokumen?.file_path ||
+          uploadedTinjauan?.file ||
+          uploadedTinjauan?.file_path ||
+          uploadedTinjauan?.file_dokumentasi ||
+          uploadedTinjauan?.url_dokumentasi ||
+          null,
+      );
+      setPhoto(uri);
+    } catch (error) {
+      console.log('upload failed', error);
+      if (isMountedRef.current) {
+        Alert.alert(
+          'Upload Gagal',
+          getApiErrorMessage(
+            error,
+            'Dokumentasi akhir belum berhasil diupload ke backend.',
+          ),
+        );
+      }
     } finally {
-      setUploading(false);
+      if (isMountedRef.current) {
+        setUploading(false);
+      }
     }
   };
 
@@ -210,8 +378,7 @@ export default function TaskDetailScreen() {
   const surveyComment = visibleSurvey?.jawaban6 ?? visibleSurvey?.comment ?? '';
   const surveyName = visibleSurvey?.nama_klien ?? visibleSurvey?.nama ?? '-';
   const surveyNip = visibleSurvey?.nip_klien ?? visibleSurvey?.nip ?? '-';
-  const resolvedDocumentUri = normalizeDocumentUrl(photo || dokumenUrl || (dokumenId ? getDocumentFileUrl(dokumenId) : ''));
-  const safeDocumentUri = typeof resolvedDocumentUri === 'string' ? resolvedDocumentUri.trim() : '';
+
   const canFillSurvey = surveyCompleted || dokumenExists || Boolean(photo);
   const canUploadDocument = visibleTask.status === 'Sedang Berlangsung' && !dokumenExists && !photo;
   const uploadButtonDisabled = uploading;
@@ -319,29 +486,57 @@ export default function TaskDetailScreen() {
       <Modal
         visible={showPhotoModal}
         transparent={true}
-        onRequestClose={() => setShowPhotoModal(false)}>
+        onRequestClose={handleClosePhotoModal}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <TouchableOpacity style={styles.closeButton} onPress={() => setShowPhotoModal(false)}>
+            <TouchableOpacity style={styles.closeButton} onPress={handleClosePhotoModal}>
               <Text style={styles.closeButtonText}>X</Text>
             </TouchableOpacity>
 
-            {safeDocumentUri && !documentImageError ? (
-              <Image
-                source={{
-                  uri: safeDocumentUri,
-                  headers: authToken ? { Authorization: `Bearer ${authToken}` } : undefined
-                }}
-                style={styles.fullImage}
-                resizeMode="contain"
-                onError={() => setDocumentImageError(true)}
-              />
+            {downloadingDocument ? (
+              <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                <ActivityIndicator size="large" color={colors.primaryBlue} />
+                <Text style={{ marginTop: 12, color: '#fff', fontSize: 14 }}>
+                  Mengunduh dokumen...
+                </Text>
+              </View>
+            ) : cachedDocumentUri && !documentLoadError ? (
+              cachedDocumentUri.toLowerCase().includes('.pdf') ? (
+                <WebView
+                  source={{ uri: cachedDocumentUri }}
+                  style={{ flex: 1, width: '100%', borderRadius: 12 }}
+                  startInLoadingState={true}
+                  renderLoading={() => (
+                    <ActivityIndicator size="large" color={colors.primaryBlue} style={{ flex: 1 }} />
+                  )}
+                  onError={(e) => {
+                    console.log('WEBVIEW ERROR', e.nativeEvent);
+                    if (isMountedRef.current) setDocumentLoadError(true);
+                  }}
+                />
+              ) : (
+                <Image
+                  source={{ uri: cachedDocumentUri }}
+                  style={styles.fullImage}
+                  resizeMode="contain"
+                  onError={(e) => {
+                    console.log('IMAGE ERROR', e.nativeEvent);
+                    if (isMountedRef.current) setDocumentLoadError(true);
+                  }}
+                />
+              )
             ) : (
               <View style={styles.emptyDocumentState}>
-                <Text style={styles.emptyDocumentTitle}>Dokumen tidak dapat ditampilkan</Text>
+                <Text style={{ fontSize: 42, marginBottom: 12, textAlign: 'center' }}>📄</Text>
+                <Text style={styles.emptyDocumentTitle}>Dokumentasi tidak dapat ditampilkan</Text>
                 <Text style={styles.emptyDocumentText}>
-                  Link dokumen akhir tidak tersedia atau file tidak dapat dibuka di perangkat ini.
+                  Terjadi kesalahan saat memuat dokumentasi.
                 </Text>
+                <TouchableOpacity
+                  style={[styles.actionButton, { marginTop: 16, paddingHorizontal: 24 }]}
+                  onPress={downloadAndCacheDocument}>
+                  <Text style={styles.actionButtonText}>Coba Lagi</Text>
+                </TouchableOpacity>
               </View>
             )}
           </View>

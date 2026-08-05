@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, { useRef, useState } from 'react';
 import {
   ActivityIndicator,
   SafeAreaView,
@@ -6,13 +6,13 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {WebView, WebViewNavigation} from 'react-native-webview';
-import {useNavigation} from '@react-navigation/native';
+import { WebView, WebViewNavigation } from 'react-native-webview';
+import { useNavigation } from '@react-navigation/native';
 
-import {SSO_LOGIN_URL} from '../../config/api';
-import {loginWithSSOToken} from '../../services/mobile';
-import {saveStaffUUID, saveUser} from '../../storage/auth';
-import {styles} from './styles';
+import { SSO_LOGIN_URL } from '../../config/api';
+import { loginWithSSOToken } from '../../services/mobile';
+import { saveStaffUUID, saveUser } from '../../storage/auth';
+import { styles } from './styles';
 
 export default function SSOWebViewScreen() {
   const navigation = useNavigation<any>();
@@ -56,12 +56,13 @@ export default function SSOWebViewScreen() {
         if (pad) {
           base64 += new Array(5 - pad).join('=');
         }
-        
+
         // Decode base64
         let jsonStr = '';
         try {
-          if (typeof atob === 'function') {
-            jsonStr = decodeURIComponent(escape(atob(base64)));
+          const atobFn = (globalThis as any).atob;
+          if (typeof atobFn === 'function') {
+            jsonStr = decodeURIComponent(escape(atobFn(base64)));
           } else {
             throw new Error('atob not found');
           }
@@ -74,8 +75,8 @@ export default function SSOWebViewScreen() {
         if (payload && payload.uuid) {
           matchedStaff = payload;
           if (matchedStaff.token) {
-             const { saveAuthToken } = require('../../storage/auth');
-             await saveAuthToken(matchedStaff.token);
+            const { saveAuthToken } = require('../../storage/auth');
+            await saveAuthToken(matchedStaff.token);
           }
         }
       } else if (tokenMatch && tokenMatch[1]) {
@@ -90,12 +91,12 @@ export default function SSOWebViewScreen() {
       }
 
       if (!matchedStaff || !matchedStaff.uuid) {
-         throw new Error('Gagal mendapatkan data pengguna dari SSO.');
+        throw new Error('Gagal mendapatkan data pengguna dari SSO.');
       }
 
       const role = String(matchedStaff.peran || matchedStaff.role || '').toLowerCase();
       if (role !== 'staf' && role !== 'staff') {
-         throw new Error('Aplikasi mobile hanya tersedia untuk pengguna dengan role Staf.');
+        throw new Error('Aplikasi mobile hanya tersedia untuk pengguna dengan role Staf.');
       }
 
       await saveUser({
@@ -115,14 +116,14 @@ export default function SSOWebViewScreen() {
       setVerifying(false);
       setError(
         err?.response?.data?.message ||
-          err?.message ||
-          'Gagal melakukan verifikasi token SSO.',
+        err?.message ||
+        'Gagal melakukan verifikasi token SSO.',
       );
     }
   };
 
   const handleNavigationStateChange = (navState: WebViewNavigation) => {
-    const {url} = navState;
+    const { url } = navState;
 
     if (
       url.includes('/auth/sso/callback') ||
@@ -136,7 +137,7 @@ export default function SSOWebViewScreen() {
   };
 
   const handleShouldStartLoadWithRequest = (request: any) => {
-    const {url} = request;
+    const { url } = request;
 
     if (
       url.includes('/auth/sso/callback') ||
@@ -170,7 +171,7 @@ export default function SSOWebViewScreen() {
 
       <View style={styles.webviewContainer}>
         <WebView
-          source={{uri: SSO_LOGIN_URL}}
+          source={{ uri: SSO_LOGIN_URL }}
           originWhitelist={['*']}
           setSupportMultipleWindows={false}
           onNavigationStateChange={handleNavigationStateChange}
