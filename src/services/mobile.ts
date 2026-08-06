@@ -167,18 +167,14 @@ export const normalizeDocumentUrl = (url?: string | null): string | null => {
 export const isVisibleMobileStatus = (status: any) =>
   visibleStatuses.includes(normalizeStatus(status));
 
-export const normalizeTask = (item: any, kind: MobileTaskKind): MobileTask => {
+export const normalizeTask = (item: any, _kind?: MobileTaskKind): MobileTask => {
   const source = unwrap(item);
+  const isProyek = source?.jenis === 'jangka_panjang' || _kind === 'proyek';
+  const kind = isProyek ? 'proyek' : 'pekerjaan';
   const status = normalizeStatus(pick(source, ['status', 'status_tugas'], ''));
   const unitKerja = pick<any>(source, ['unit_kerja', 'unit_peminta'], null);
   const suratMasuk = pick<any>(source, ['surat_masuk'], null);
-  const rawId = pick(
-    source,
-    kind === 'proyek'
-      ? ['id_proyek', 'proyek_id', 'id']
-      : ['id_pekerjaan', 'pekerjaan_id', 'id'],
-    '',
-  );
+  const rawId = pick(source, ['id_pekerjaan', 'pekerjaan_id', 'id_proyek', 'id'], '');
   const review = pick<any>(source, ['tinjauan', 'review'], null);
   const document = pick<any>(
     source,
@@ -260,7 +256,7 @@ export const normalizeTask = (item: any, kind: MobileTaskKind): MobileTask => {
   };
 };
 
-const normalizeList = (payload: any, kind: MobileTaskKind) => {
+const normalizeList = (payload: any, kind?: MobileTaskKind) => {
   const items = unwrap(payload);
   const list = Array.isArray(items) ? items : [];
 
@@ -360,21 +356,15 @@ const userParam = (staffUuid: string) => ({
 });
 
 export const getActiveMobileTasks = async (staffUuid: string) => {
-  const [pekerjaanRes, proyekRes] = await Promise.all([
-    api.get('/mobile/pekerjaan-aktif', userParam(staffUuid)),
-    api.get('/mobile/proyek-aktif', userParam(staffUuid)),
-  ]);
+  const pekerjaanRes = await api.get('/mobile/pekerjaan-aktif', userParam(staffUuid));
 
-  return [
-    ...normalizeList(pekerjaanRes.data, 'pekerjaan'),
-    ...normalizeList(proyekRes.data, 'proyek'),
-  ];
+  return normalizeList(pekerjaanRes.data);
 };
 
 export const getMobileTaskDetail = async (task: Pick<MobileTask, 'rawId' | 'kind'>, staffUuid: string) => {
-  const response = await api.get(`/mobile/${task.kind}/${task.rawId}`, userParam(staffUuid));
+  const response = await api.get(`/mobile/pekerjaan/${task.rawId}`, userParam(staffUuid));
 
-  return normalizeTask(response.data, task.kind);
+  return normalizeTask(response.data);
 };
 export const uploadFinalDocumentation = async (
   task: Pick<MobileTask, 'rawId' | 'kind'>,
@@ -385,7 +375,7 @@ export const uploadFinalDocumentation = async (
   form.append('id_pengguna', staffUuid);
   form.append('dokumentasi_akhir', file as any);
 
-  const response = await api.post(`/mobile/${task.kind}/${task.rawId}/dokumentasi-akhir`, form);
+  const response = await api.post(`/mobile/pekerjaan/${task.rawId}/dokumentasi-akhir`, form);
 
   return response.data;
 };
@@ -404,7 +394,7 @@ export const submitTaskSurvey = async (
     jawaban6?: string;
   },
 ) => {
-  const response = await api.post(`/mobile/${task.kind}/${task.rawId}/survei`, payload);
+  const response = await api.post(`/mobile/pekerjaan/${task.rawId}/survei`, payload);
 
   return response.data;
 };

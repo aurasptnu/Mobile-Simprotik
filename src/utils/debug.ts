@@ -10,7 +10,6 @@ export const debugConfig = {
   endpoints: {
     staffDemo: `${API_BASE_URL}/master/pengguna/staf`,
     tasks: `${API_BASE_URL}/mobile/pekerjaan-aktif`,
-    projects: `${API_BASE_URL}/mobile/proyek-aktif`,
   },
 };
 
