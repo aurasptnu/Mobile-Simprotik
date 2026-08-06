@@ -27,6 +27,15 @@ import { getDashboard } from '../../services/mobile';
 import { styles } from './styles';
 import {colors} from '../../theme';
 
+const formatJenis = (val: any) => {
+  if (!val) return '-';
+  const str = String(val).trim();
+  if (!str) return '-';
+  return str
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, l => l.toUpperCase());
+};
+
 export default function HomeScreen() {
   const navigation =
     useNavigation<any>();
@@ -425,6 +434,13 @@ export default function HomeScreen() {
                   task.type ||
                   'Pekerjaan'
                 }
+              </Text>
+              <Text
+                style={
+                  styles.taskInfo
+                }
+              >
+                Jenis: {formatJenis(task.jenis || task.raw?.jenis || task.raw?.jenis_pekerjaan)}
               </Text>
             </View>
 

@@ -9,6 +9,7 @@ export type MobileTask = {
   rawId: string | number;
   kind: MobileTaskKind;
   type: 'Pekerjaan' | 'Proyek';
+  jenis?: string;
   title: string;
   status: string;
   assignedBy: string;
@@ -169,6 +170,7 @@ export const isVisibleMobileStatus = (status: any) =>
 
 export const normalizeTask = (item: any, _kind?: MobileTaskKind): MobileTask => {
   const source = unwrap(item);
+  const rawJenis = pick(source, ['jenis', 'jenis_pekerjaan', 'jenis_proyek'], source?.jenis || null);
   const isProyek = source?.jenis === 'jangka_panjang' || _kind === 'proyek';
   const kind = isProyek ? 'proyek' : 'pekerjaan';
   const status = normalizeStatus(pick(source, ['status', 'status_tugas'], ''));
@@ -211,6 +213,7 @@ export const normalizeTask = (item: any, _kind?: MobileTaskKind): MobileTask => 
     rawId,
     kind,
     type: kind === 'proyek' ? 'Proyek' : 'Pekerjaan',
+    jenis: rawJenis ? String(rawJenis) : undefined,
     title: String(pick(source, ['nama_tugas', 'judul', 'nama', 'nama_pekerjaan', 'nama_proyek', 'title'], '-')),
     status,
     assignedBy: String(

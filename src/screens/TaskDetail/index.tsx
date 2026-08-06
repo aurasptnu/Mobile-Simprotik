@@ -45,6 +45,15 @@ const getApiErrorMessage = (error: any, fallback: string) => {
   return data?.message || error?.message || fallback;
 };
 
+const formatJenis = (val: any) => {
+  if (!val) return '-';
+  const str = String(val).trim();
+  if (!str) return '-';
+  return str
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, l => l.toUpperCase());
+};
+
 const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
   let binary = '';
   const bytes = new Uint8Array(buffer);
@@ -420,6 +429,17 @@ export default function TaskDetailScreen() {
       <View style={styles.card}>
         <Text style={styles.label}>Tipe</Text>
         <Text style={styles.value}>{visibleTask.type || 'Pekerjaan'}</Text>
+      </View>
+
+      <View style={styles.card}>
+        <Text style={styles.label}>Jenis Pekerjaan</Text>
+        <Text style={styles.value}>
+          {formatJenis(
+            visibleTask.jenis ||
+              visibleTask.raw?.jenis ||
+              visibleTask.raw?.jenis_pekerjaan,
+          )}
+        </Text>
       </View>
 
       <View style={styles.card}>
