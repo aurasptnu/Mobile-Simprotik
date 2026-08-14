@@ -85,10 +85,6 @@ export default function TaskDetailScreen() {
   const [loadingDetail, setLoadingDetail] = useState(true);
   const [uploading, setUploading] = useState(false);
 
-  const [showHistoryModal, setShowHistoryModal] = useState(false);
-  const [extensionHistory, setExtensionHistory] = useState<any[]>([]);
-  const [loadingHistory, setLoadingHistory] = useState(false);
-
   const [cachedDocumentUri, setCachedDocumentUri] = useState<string | null>(null);
   const [downloadingDocument, setDownloadingDocument] = useState<boolean>(false);
   const [documentLoadError, setDocumentLoadError] = useState<boolean>(false);
@@ -381,20 +377,6 @@ export default function TaskDetailScreen() {
     });
   };
 
-  const fetchExtensionHistory = async () => {
-    setShowHistoryModal(true);
-    setLoadingHistory(true);
-    try {
-      const response = await api.get(`/pekerjaan/${visibleTask.id_pekerjaan || visibleTask.id}/perpanjangan`);
-      setExtensionHistory(response.data.data || []);
-    } catch (error) {
-      console.log('fetchExtensionHistory error', error);
-      Alert.alert('Gagal', 'Tidak dapat memuat riwayat perpanjangan.');
-    } finally {
-      setLoadingHistory(false);
-    }
-  };
-
   const visibleTask = detail || task;
   const visibleSurvey = surveyResult?.backend || surveyResult || visibleTask.surveyAnswers || null;
   const surveyAnswers = visibleSurvey?.answers || {};
@@ -493,9 +475,6 @@ export default function TaskDetailScreen() {
             return null;
           })()}
         </View>
-        <TouchableOpacity style={{marginTop: 8}} onPress={fetchExtensionHistory}>
-          <Text style={{color: colors.primaryBlue, fontSize: 13, fontWeight: '500'}}>Lihat Riwayat Perpanjangan</Text>
-        </TouchableOpacity>
       </View>
 
       <View style={styles.card}>
@@ -643,43 +622,6 @@ export default function TaskDetailScreen() {
             )}
 
             <TouchableOpacity style={styles.surveyCloseBtn} onPress={() => setShowSurveyModal(false)}>
-              <Text style={styles.surveyCloseBtnText}>Tutup</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-
-      {/* Modal Riwayat Perpanjangan */}
-      <Modal
-        visible={showHistoryModal}
-        transparent={true}
-        onRequestClose={() => setShowHistoryModal(false)}>
-        <View style={styles.modalOverlay}>
-          <View style={styles.surveyModalContent}>
-            <TouchableOpacity style={styles.closeButton} onPress={() => setShowHistoryModal(false)}>
-              <Text style={styles.closeButtonText}>X</Text>
-            </TouchableOpacity>
-
-            <Text style={styles.surveyTitle}>Riwayat Perpanjangan</Text>
-            {loadingHistory ? (
-              <ActivityIndicator size="large" color={colors.primaryBlue} style={{marginTop: 20}} />
-            ) : extensionHistory.length > 0 ? (
-              <ScrollView style={styles.surveyResultScroll} showsVerticalScrollIndicator={false}>
-                {extensionHistory.map((item: any, index: number) => (
-                  <View key={item.id_perpanjangan || index} style={{marginBottom: 16, backgroundColor: '#f8fafc', padding: 12, borderRadius: 8, borderWidth: 1, borderColor: '#e2e8f0'}}>
-                    <Text style={{fontWeight: 'bold', color: colors.textDark, marginBottom: 4}}>Perpanjangan Ke-{extensionHistory.length - index}</Text>
-                    <Text style={{fontSize: 13, color: colors.textDark}}><Text style={{fontWeight: '600'}}>Tanggal Lama:</Text> {item.tanggal_lama}</Text>
-                    <Text style={{fontSize: 13, color: colors.textDark}}><Text style={{fontWeight: '600'}}>Tanggal Baru:</Text> {item.tanggal_baru}</Text>
-                    <Text style={{fontSize: 13, color: colors.textDark}}><Text style={{fontWeight: '600'}}>Diajukan Oleh:</Text> {item.pengguna?.nama_lengkap || '-'}</Text>
-                    <Text style={{fontSize: 13, color: colors.textDark, marginTop: 4}}><Text style={{fontWeight: '600'}}>Alasan:</Text> {item.alasan}</Text>
-                  </View>
-                ))}
-              </ScrollView>
-            ) : (
-              <Text style={styles.surveyStatus}>Belum pernah diperpanjang.</Text>
-            )}
-
-            <TouchableOpacity style={styles.surveyCloseBtn} onPress={() => setShowHistoryModal(false)}>
               <Text style={styles.surveyCloseBtnText}>Tutup</Text>
             </TouchableOpacity>
           </View>
