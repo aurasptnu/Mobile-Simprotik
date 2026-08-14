@@ -454,7 +454,27 @@ export default function TaskDetailScreen() {
 
       <View style={styles.card}>
         <Text style={styles.label}>Target Selesai</Text>
-        <Text style={styles.value}>{visibleTask.deadline || '-'}</Text>
+        <View style={{flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap'}}>
+          <Text style={styles.value}>{visibleTask.deadline || '-'}</Text>
+          {(() => {
+            if (!visibleTask.deadline || visibleTask.status === 'Selesai') return null;
+            const deadline = new Date(visibleTask.deadline);
+            const today = new Date();
+            deadline.setHours(0, 0, 0, 0);
+            today.setHours(0, 0, 0, 0);
+            
+            if (today > deadline) {
+              const diffTime = Math.abs(today.getTime() - deadline.getTime());
+              const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+              return (
+                <View style={{backgroundColor: '#ef4444', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, marginLeft: 8}}>
+                  <Text style={{color: 'white', fontSize: 10, fontWeight: 'bold'}}>Terlambat {diffDays} hari</Text>
+                </View>
+              );
+            }
+            return null;
+          })()}
+        </View>
       </View>
 
       <View style={styles.card}>
