@@ -172,7 +172,13 @@ export const isVisibleMobileStatus = (status: any) =>
 export const normalizeTask = (item: any, _kind?: MobileTaskKind): MobileTask => {
   const source = unwrap(item);
   const rawJenis = pick(source, ['jenis', 'jenis_pekerjaan', 'jenis_proyek'], source?.jenis || null);
-  const isProyek = source?.jenis === 'jangka_panjang' || _kind === 'proyek';
+  const rawJenisStr = String(rawJenis || '').toLowerCase();
+  const isProyek =
+    rawJenisStr.includes('panjang') ||
+    rawJenisStr.includes('proyek') ||
+    _kind === 'proyek' ||
+    String(source?.kind || '').toLowerCase() === 'proyek' ||
+    String(source?.type || '').toLowerCase() === 'proyek';
   const kind = isProyek ? 'proyek' : 'pekerjaan';
   const status = normalizeStatus(pick(source, ['status', 'status_tugas'], ''));
   const unitKerja = pick<any>(source, ['unit_kerja', 'unit_peminta'], null);

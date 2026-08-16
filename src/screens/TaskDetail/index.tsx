@@ -63,9 +63,26 @@ const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
     const chunk = bytes.subarray(i, i + chunkSize);
     binary += String.fromCharCode.apply(null, chunk as unknown as number[]);
   }
-  return typeof btoa !== 'undefined'
-    ? btoa(binary)
-    : Buffer.from(binary, 'binary').toString('base64');
+  const globalRef = globalThis as any;
+  if (typeof globalRef.btoa === 'function') {
+    return globalRef.btoa(binary);
+  }
+  if (globalRef.Buffer) {
+    return globalRef.Buffer.from(binary, 'binary').toString('base64');
+  }
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+  let result = '';
+  for (let i = 0; i < binary.length; i += 3) {
+    const b1 = binary.charCodeAt(i);
+    const b2 = i + 1 < binary.length ? binary.charCodeAt(i + 1) : 0;
+    const b3 = i + 2 < binary.length ? binary.charCodeAt(i + 2) : 0;
+    const c1 = b1 >> 2;
+    const c2 = ((b1 & 3) << 4) | (b2 >> 4);
+    const c3 = ((b2 & 15) << 2) | (b3 >> 6);
+    const c4 = b3 & 63;
+    result += chars[c1] + chars[c2] + (i + 1 < binary.length ? chars[c3] : '=') + (i + 2 < binary.length ? chars[c4] : '=');
+  }
+  return result;
 };
 
 export default function TaskDetailScreen() {
@@ -163,7 +180,7 @@ export default function TaskDetailScreen() {
         cancelToken: cancelTokenSource.token,
       });
 
-      const contentType = (
+      const contentType = String(
         response.headers?.['content-type'] ||
         response.headers?.['Content-Type'] ||
         ''

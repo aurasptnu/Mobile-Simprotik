@@ -25,7 +25,7 @@ import {
 import { getDashboard } from '../../services/mobile';
 
 import { styles } from './styles';
-import {colors} from '../../theme';
+import {colors, font} from '../../theme';
 
 const formatJenis = (val: any) => {
   if (!val) return '-';
@@ -35,6 +35,91 @@ const formatJenis = (val: any) => {
     .replace(/_/g, ' ')
     .replace(/\b\w/g, l => l.toUpperCase());
 };
+
+const parseDateParts = (deadlineStr: string) => {
+
+  if (!deadlineStr || deadlineStr === '-') return null;
+  const str = deadlineStr.trim();
+
+  const isoMatch = str.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+  if (isoMatch) {
+    return {
+      year: parseInt(isoMatch[1], 10),
+      month: parseInt(isoMatch[2], 10),
+      day: parseInt(isoMatch[3], 10),
+    };
+  }
+
+  const dmyMatch = str.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})/);
+  if (dmyMatch) {
+    return {
+      day: parseInt(dmyMatch[1], 10),
+      month: parseInt(dmyMatch[2], 10),
+      year: parseInt(dmyMatch[3], 10),
+    };
+  }
+
+  const lowerStr = str.toLowerCase();
+  const yearMatch = str.match(/\b(20\d{2})\b/);
+  const dayMatch = str.match(/\b([1-9]|[12]\d|3[01])\b/);
+
+  const monthMap: Record<string, number> = {
+    jan: 1, januari: 1, january: 1,
+    feb: 2, februari: 2, february: 2,
+    mar: 3, maret: 3, march: 3,
+    apr: 4, april: 4,
+    mei: 5, may: 5,
+    jun: 6, juni: 6, june: 6,
+    jul: 7, juli: 7, july: 7,
+    agu: 8, agustus: 8, aug: 8, august: 8,
+    sep: 9, september: 9,
+    okt: 10, oktober: 10, oct: 10, october: 10,
+    nov: 11, november: 11,
+    des: 12, desember: 12, dec: 12, december: 12,
+  };
+
+  let foundMonth: number | null = null;
+  for (const [key, val] of Object.entries(monthMap)) {
+    if (lowerStr.includes(key)) {
+      foundMonth = val;
+      break;
+    }
+  }
+
+  const parsedDate = new Date(str);
+  const validDate = !isNaN(parsedDate.getTime());
+
+  return {
+    day: dayMatch ? parseInt(dayMatch[1], 10) : validDate ? parsedDate.getDate() : null,
+    month: foundMonth !== null ? foundMonth : validDate ? parsedDate.getMonth() + 1 : null,
+    year: yearMatch ? parseInt(yearMatch[1], 10) : validDate ? parsedDate.getFullYear() : null,
+  };
+};
+
+const isTaskOverdue = (task: any) => {
+  if (!task.deadline || task.deadline === '-' || task.status === 'Selesai') return false;
+
+  let deadlineDate: Date | null = null;
+  const parts = parseDateParts(task.deadline);
+  if (parts && parts.year !== null && parts.month !== null && parts.day !== null) {
+    deadlineDate = new Date(parts.year, parts.month - 1, parts.day);
+  } else {
+    const d = new Date(task.deadline);
+    if (!isNaN(d.getTime())) {
+      deadlineDate = d;
+    }
+  }
+
+  if (!deadlineDate || isNaN(deadlineDate.getTime())) return false;
+
+  const deadline = new Date(deadlineDate);
+  const today = new Date();
+  deadline.setHours(0, 0, 0, 0);
+  today.setHours(0, 0, 0, 0);
+
+  return today > deadline;
+};
+
 
 export default function HomeScreen() {
   const navigation =
@@ -133,6 +218,11 @@ export default function HomeScreen() {
         item.status ===
         'Dalam Tinjauan',
     ).length;
+
+  const totalTerlambat =
+    dashboard?.terlambat ??
+    userTasks.filter(isTaskOverdue).length;
+
 
   return (
     <ScrollView
@@ -284,6 +374,40 @@ export default function HomeScreen() {
           </Text>
         </View>
       </View>
+
+      {/* CARD PERINGATAN TUGAS TERLAMBAT (FULL WIDTH) */}
+      <TouchableOpacity
+        style={[
+          styles.warningCard,
+          totalTerlambat > 0
+            ? { backgroundColor: '#fef2f2', borderColor: '#fca5a5' }
+            : { backgroundColor: colors.white, borderColor: colors.borderSoft }
+        ]}
+        onPress={() => navigation.navigate('Tugas')}
+        activeOpacity={0.8}
+      >
+        <View style={styles.warningCardContent}>
+          <View style={[styles.warningIconContainer, totalTerlambat === 0 && { backgroundColor: colors.surface2 }]}>
+            <Text style={{ fontSize: 20 }}>{totalTerlambat > 0 ? '⚠️' : '✅'}</Text>
+          </View>
+          <View style={{ flex: 1, marginLeft: 12 }}>
+            <Text style={[styles.warningCardTitle, totalTerlambat > 0 && { color: '#991b1b' }]}>
+              PERINGATAN TUGAS TERLAMBAT
+            </Text>
+            <Text style={[styles.warningCardSub, totalTerlambat > 0 && { color: '#b91c1c' }]}>
+              {totalTerlambat > 0
+                ? `${totalTerlambat} tugas telah melewati target selesai`
+                : 'Tidak ada tugas yang terlambat saat ini'}
+            </Text>
+          </View>
+          <View style={[styles.warningBadge, totalTerlambat > 0 ? { backgroundColor: '#ef4444' } : { backgroundColor: colors.success || '#10b981' }]}>
+            <Text style={{ color: '#ffffff', fontSize: font.size.sm, fontWeight: font.weight.bold }}>
+              {totalTerlambat}
+            </Text>
+          </View>
+        </View>
+      </TouchableOpacity>
+
 
       {/* PROGRESS */}
       <Text

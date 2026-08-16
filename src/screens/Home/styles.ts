@@ -265,4 +265,51 @@ export const styles =
       color: colors.textMuted,
       fontSize: font.size.sm,
     },
+
+    warningCard: {
+      width: '100%',
+      borderRadius: radius.xl,
+      padding: 16,
+      borderWidth: 1,
+      marginBottom: 25,
+      ...shadow.card,
+    },
+
+    warningCardContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+
+    warningIconContainer: {
+      width: 40,
+      height: 40,
+      borderRadius: radius.lg,
+      backgroundColor: '#fee2e2',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+
+    warningCardTitle: {
+      fontSize: font.size.xs,
+      fontWeight: font.weight.bold,
+      color: colors.textSoft,
+      letterSpacing: 0.5,
+      marginBottom: 2,
+    },
+
+    warningCardSub: {
+      fontSize: font.size.sm,
+      fontWeight: font.weight.medium,
+      color: colors.textMuted,
+    },
+
+    warningBadge: {
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: radius.full,
+      justifyContent: 'center',
+      alignItems: 'center',
+      minWidth: 32,
+    },
   });
+

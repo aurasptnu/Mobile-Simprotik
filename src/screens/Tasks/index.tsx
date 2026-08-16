@@ -80,51 +80,125 @@ const getAvailableYears = (tasks: any[]) => {
   return Array.from(yearSet).sort();
 };
 
+const parseDateParts = (deadlineStr: string) => {
+  if (!deadlineStr || deadlineStr === '-') return null;
+  const str = deadlineStr.trim();
+
+  // 1. YYYY-MM-DD or YYYY/MM/DD (e.g. 2026-08-20 or 2026-08-20 14:30:00)
+  const isoMatch = str.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+  if (isoMatch) {
+    return {
+      year: parseInt(isoMatch[1], 10),
+      month: parseInt(isoMatch[2], 10),
+      day: parseInt(isoMatch[3], 10),
+    };
+  }
+
+  // 2. DD-MM-YYYY or DD/MM/YYYY (e.g. 20-08-2026 or 20/08/2026)
+  const dmyMatch = str.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})/);
+  if (dmyMatch) {
+    return {
+      day: parseInt(dmyMatch[1], 10),
+      month: parseInt(dmyMatch[2], 10),
+      year: parseInt(dmyMatch[3], 10),
+    };
+  }
+
+  // 3. Textual / Word format (e.g. "20 Agustus 2026", "20-Aug-2026")
+  const lowerStr = str.toLowerCase();
+  const yearMatch = str.match(/\b(20\d{2})\b/);
+  const dayMatch = str.match(/\b([1-9]|[12]\d|3[01])\b/);
+
+  const monthMap: Record<string, number> = {
+    jan: 1, januari: 1, january: 1,
+    feb: 2, februari: 2, february: 2,
+    mar: 3, maret: 3, march: 3,
+    apr: 4, april: 4,
+    mei: 5, may: 5,
+    jun: 6, juni: 6, june: 6,
+    jul: 7, juli: 7, july: 7,
+    agu: 8, agustus: 8, aug: 8, august: 8,
+    sep: 9, september: 9,
+    okt: 10, oktober: 10, oct: 10, october: 10,
+    nov: 11, november: 11,
+    des: 12, desember: 12, dec: 12, december: 12,
+  };
+
+  let foundMonth: number | null = null;
+  for (const [key, val] of Object.entries(monthMap)) {
+    if (lowerStr.includes(key)) {
+      foundMonth = val;
+      break;
+    }
+  }
+
+  const parsedDate = new Date(str);
+  const validDate = !isNaN(parsedDate.getTime());
+
+  return {
+    day: dayMatch ? parseInt(dayMatch[1], 10) : validDate ? parsedDate.getDate() : null,
+    month: foundMonth !== null ? foundMonth : validDate ? parsedDate.getMonth() + 1 : null,
+    year: yearMatch ? parseInt(yearMatch[1], 10) : validDate ? parsedDate.getFullYear() : null,
+  };
+};
+
 const matchDeadlineDate = (deadlineStr: string, day: string, month: string, year: string) => {
   if (!day && !month && !year) return true;
   if (!deadlineStr || deadlineStr === '-') return false;
 
-  const str = deadlineStr.toLowerCase();
+  const dateParts = parseDateParts(deadlineStr);
+  if (!dateParts) return false;
 
-  if (year.trim() && !str.includes(year.trim())) {
-    return false;
-  }
-
-  if (day.trim()) {
-    const dNum = parseInt(day.trim(), 10);
-    if (!isNaN(dNum)) {
-      const dPadded = dNum < 10 ? `0${dNum}` : `${dNum}`;
-      const dayRegex = new RegExp(`\\b0?${dNum}\\b`);
-      if (!dayRegex.test(str) && !str.includes(dPadded)) {
-        return false;
-      }
+  if (year.trim()) {
+    const yNum = parseInt(year.trim(), 10);
+    if (!isNaN(yNum) && dateParts.year !== null && dateParts.year !== yNum) {
+      return false;
     }
   }
 
   if (month.trim()) {
     const mNum = parseInt(month.trim(), 10);
-    const monthNames = [
-      'jan', 'feb', 'mar', 'apr', 'mei', 'may', 'jun',
-      'jul', 'agu', 'aug', 'sep', 'okt', 'oct', 'nov', 'des', 'dec',
-    ];
-    if (!isNaN(mNum) && mNum >= 1 && mNum <= 12) {
-      const mPadded = mNum < 10 ? `0${mNum}` : `${mNum}`;
-      const mName = monthNames[mNum - 1];
-      const matchNum =
-        str.includes(`-${mPadded}-`) ||
-        str.includes(`/${mPadded}/`) ||
-        str.includes(`-${mNum}-`) ||
-        str.includes(`/${mNum}/`);
-      const matchText = str.includes(mName);
-      if (!matchNum && !matchText) {
-        return false;
-      }
-    } else if (!str.includes(month.trim().toLowerCase())) {
+    if (!isNaN(mNum) && dateParts.month !== null && dateParts.month !== mNum) {
+      return false;
+    }
+  }
+
+  if (day.trim()) {
+    const dNum = parseInt(day.trim(), 10);
+    if (!isNaN(dNum) && dateParts.day !== null && dateParts.day !== dNum) {
       return false;
     }
   }
 
   return true;
+};
+
+const getLateDays = (deadlineStr?: string, status?: string) => {
+  if (!deadlineStr || deadlineStr === '-' || status === 'Selesai') return 0;
+
+  let deadlineDate: Date | null = null;
+  const parts = parseDateParts(deadlineStr);
+  if (parts && parts.year !== null && parts.month !== null && parts.day !== null) {
+    deadlineDate = new Date(parts.year, parts.month - 1, parts.day);
+  } else {
+    const d = new Date(deadlineStr);
+    if (!isNaN(d.getTime())) {
+      deadlineDate = d;
+    }
+  }
+
+  if (!deadlineDate || isNaN(deadlineDate.getTime())) return 0;
+
+  const deadline = new Date(deadlineDate);
+  const today = new Date();
+  deadline.setHours(0, 0, 0, 0);
+  today.setHours(0, 0, 0, 0);
+
+  if (today > deadline) {
+    const diffTime = Math.abs(today.getTime() - deadline.getTime());
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  }
+  return 0;
 };
 
 export default function TasksScreen() {
@@ -252,13 +326,20 @@ export default function TasksScreen() {
     if (selectedJenis !== 'Semua') {
       myTasks = myTasks.filter(task => {
         const rawJ = String(
-          task.jenis || task.raw?.jenis || task.raw?.jenis_pekerjaan || '',
+          task.jenis || task.jenisPekerjaan || task.raw?.jenis || task.raw?.jenis_pekerjaan || task.raw?.jenis_proyek || '',
         ).toLowerCase();
+
+        const isProyek =
+          rawJ.includes('panjang') ||
+          rawJ.includes('proyek') ||
+          task.kind === 'proyek' ||
+          task.type === 'Proyek';
+
         if (selectedJenis === 'Jangka Panjang') {
-          return rawJ.includes('panjang') || task.type === 'Proyek';
+          return isProyek;
         }
         if (selectedJenis === 'Jangka Pendek') {
-          return rawJ.includes('pendek') || task.type === 'Pekerjaan';
+          return !isProyek;
         }
         return true;
       });
@@ -446,7 +527,19 @@ export default function TasksScreen() {
           <Text style={styles.indicatorText}>
             Survei: {item.surveyCompleted ? 'Ada' : 'Belum'}
           </Text>
+          {(() => {
+            const lateDays = getLateDays(item.deadline, item.status);
+            if (lateDays > 0) {
+              return (
+                <Text style={[styles.indicatorText, {backgroundColor: '#ef4444', color: '#ffffff', fontWeight: 'bold'}]}>
+                  Terlambat {lateDays} hari
+                </Text>
+              );
+            }
+            return null;
+          })()}
         </View>
+
       </TouchableOpacity>
     );
 
