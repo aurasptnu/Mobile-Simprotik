@@ -7,7 +7,7 @@ import {
   View,
 } from 'react-native';
 import { WebView, WebViewNavigation } from 'react-native-webview';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 import { SSO_LOGIN_URL } from '../../config/api';
 import { loginWithSSOToken } from '../../services/mobile';
@@ -16,6 +16,8 @@ import { styles } from './styles';
 
 export default function SSOWebViewScreen() {
   const navigation = useNavigation<any>();
+  const route = useRoute<any>();
+  const targetUrl = route?.params?.url || SSO_LOGIN_URL;
   const [loading, setLoading] = useState(true);
   const [verifying, setVerifying] = useState(false);
   const [error, setError] = useState('');
@@ -171,7 +173,7 @@ export default function SSOWebViewScreen() {
 
       <View style={styles.webviewContainer}>
         <WebView
-          source={{ uri: SSO_LOGIN_URL }}
+          source={{ uri: targetUrl }}
           originWhitelist={['*']}
           setSupportMultipleWindows={false}
           onNavigationStateChange={handleNavigationStateChange}

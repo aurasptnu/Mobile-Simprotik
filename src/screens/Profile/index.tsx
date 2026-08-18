@@ -53,7 +53,8 @@ export default function ProfileScreen() {
       await logoutUser();
 
       navigation.replace(
-        'Login',
+        'SSOWebView',
+        { url: 'https://login.unila.ac.id/cas/logout' },
       );
     };
 
