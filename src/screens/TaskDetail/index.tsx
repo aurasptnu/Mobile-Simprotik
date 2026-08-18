@@ -495,7 +495,7 @@ export default function TaskDetailScreen() {
       </View>
 
       <View style={styles.card}>
-        <Text style={styles.label}>Informasi Biaya & Anggaran (PMBOK Cost)</Text>
+        <Text style={styles.label}>Informasi Biaya & Anggaran</Text>
         <View style={{marginTop: 6}}>
           <Text style={{fontSize: 12, color: colors.textMuted}}>Sumber Dana:</Text>
           <Text style={{fontSize: 14, fontWeight: 'bold', color: colors.textDark, marginBottom: 4}}>
