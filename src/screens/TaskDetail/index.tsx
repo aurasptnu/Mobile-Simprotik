@@ -495,6 +495,22 @@ export default function TaskDetailScreen() {
       </View>
 
       <View style={styles.card}>
+        <Text style={styles.label}>Informasi Biaya & Anggaran (PMBOK Cost)</Text>
+        <View style={{marginTop: 6}}>
+          <Text style={{fontSize: 12, color: colors.textMuted}}>Sumber Dana:</Text>
+          <Text style={{fontSize: 14, fontWeight: 'bold', color: colors.textDark, marginBottom: 4}}>
+            {visibleTask.sumberDana || visibleTask.raw?.sumber_dana || '-'}
+          </Text>
+          <Text style={{fontSize: 12, color: colors.textMuted}}>Nominal Anggaran:</Text>
+          <Text style={{fontSize: 15, fontWeight: 'bold', color: '#16a34a'}}>
+            {new Intl.NumberFormat('id-ID', {style: 'currency', currency: 'IDR', maximumFractionDigits: 0}).format(
+              Number(visibleTask.jumlahDana ?? visibleTask.raw?.jumlah_dana ?? 0),
+            )}
+          </Text>
+        </View>
+      </View>
+
+      <View style={styles.card}>
         <Text style={styles.label}>Deskripsi</Text>
         <Text style={styles.description}>{visibleTask.description || '-'}</Text>
       </View>

@@ -17,6 +17,8 @@ export type MobileTask = {
   location: string;
   description: string;
   jenisPekerjaan?: string;
+  sumberDana?: string;
+  jumlahDana?: number;
   assignedTo: string[];
   documentId?: string | number | null;
   documentUrl?: string | null;
@@ -234,6 +236,8 @@ export const normalizeTask = (item: any, _kind?: MobileTaskKind): MobileTask => 
       pick(source, ['deskripsi', 'description', 'keterangan'], suratMasuk?.perihal || source?.nama_tugas || '-'),
     ),
     jenisPekerjaan: String(pick(source, ['jenis_pekerjaan', 'jenis'], '-')),
+    sumberDana: String(pick(source, ['sumber_dana', 'sumberDana'], '-')),
+    jumlahDana: Number(pick(source, ['jumlah_dana', 'jumlahDana'], 0)),
     assignedTo: Array.isArray(assignedTo)
       ? assignedTo.map((staff: any) =>
           String(
