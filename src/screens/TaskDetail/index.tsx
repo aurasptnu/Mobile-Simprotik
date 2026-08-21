@@ -30,6 +30,7 @@ import {
   uploadFinalDocumentation,
 } from '../../services/mobile';
 import {surveyQuestions} from '../../data/surveyQuestions';
+import SandboxBanner from '../../components/SandboxBanner';
 
 const arrowIcon = require('../../assets/images/panah.png');
 
@@ -418,7 +419,9 @@ export default function TaskDetailScreen() {
   }
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <View style={{flex: 1, backgroundColor: colors.surfaceAlt}}>
+      <SandboxBanner />
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Image
           source={arrowIcon}
@@ -661,5 +664,6 @@ export default function TaskDetailScreen() {
         </View>
       </Modal>
     </ScrollView>
+    </View>
   );
 }

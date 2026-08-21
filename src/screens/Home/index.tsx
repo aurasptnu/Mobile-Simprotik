@@ -26,6 +26,7 @@ import { getDashboard } from '../../services/mobile';
 
 import { styles } from './styles';
 import {colors, font} from '../../theme';
+import SandboxBanner from '../../components/SandboxBanner';
 
 const formatJenis = (val: any) => {
   if (!val) return '-';
@@ -225,7 +226,9 @@ export default function HomeScreen() {
 
 
   return (
-    <ScrollView
+    <View style={{flex: 1, backgroundColor: colors.surfaceAlt}}>
+      <SandboxBanner />
+      <ScrollView
       style={
         styles.container
       }
@@ -597,5 +600,6 @@ export default function HomeScreen() {
           </TouchableOpacity>
         ))}
     </ScrollView>
+    </View>
   );
 }

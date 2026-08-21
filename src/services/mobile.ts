@@ -442,3 +442,12 @@ export const getSurveyQuestions = async () => {
 
 export const getDocumentFileUrl = (documentId: string | number) =>
   `${API_BASE_URL}/dokumen/${documentId}/file`;
+
+export const getMobileSandboxStatus = async (): Promise<{ is_sandbox: boolean; mode: string; label: string }> => {
+  try {
+    const response = await api.get('/system/sandbox-status');
+    return response.data?.data ?? { is_sandbox: true, mode: 'uji_coba', label: 'Mode Uji Coba' };
+  } catch (error) {
+    return { is_sandbox: true, mode: 'uji_coba', label: 'Mode Uji Coba' };
+  }
+};
